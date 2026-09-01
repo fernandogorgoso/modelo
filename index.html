@@ -146,7 +146,6 @@ const SEMILLA = [
   v("N_LOTES", "Número de lotes", "medicion", "valor", { valor: 42, unidad: "lote", nota: "Memoria PM secc. 5.2" }),
   v("L_VIALIDAD", "Longitud de vialidad", "medicion", "valor", { valor: 1348.41, unidad: "m", nota: "29,665 m² entre sección de 22.00 m" }),
   v("S_ARROYO", "Superficie de arroyo a pavimentar", "medicion", "valor", { valor: 21574.55, unidad: "m²" }),
-  v("L_BARDA", "Longitud neta de barda perimetral", "medicion", "valor", { valor: 2420, unidad: "m", nota: "Perímetro menos accesos" }),
   v("HECTAREAS", "Superficie en hectáreas", "medicion", "formula", { formula: "S_TOTAL / 10000", unidad: "ha" }),
 
   v("P_TERRACERIAS", "I.1 Preliminares y terracerías", "partida", "valor", { valor: 12946590, unidad: "$" }),
@@ -155,10 +154,9 @@ const SEMILLA = [
   v("P_PLUVIAL", "I.4 Drenaje pluvial", "partida", "valor", { valor: 7473890, unidad: "$" }),
   v("P_ELECTRICO", "I.5 Electrificación y alumbrado", "partida", "valor", { valor: 12500680, unidad: "$" }),
   v("P_EQUIPAMIENTO", "I.6 Señalización, paisaje y equipamiento", "partida", "valor", { valor: 15765854, unidad: "$" }),
-  v("P_BARDA", "I.7 Barda perimetral sobre pilotes", "partida", "valor", { valor: 13644690, unidad: "$" }),
   v("P_CASETAS", "I.8 Casetas de control de acceso", "partida", "valor", { valor: 8513500, unidad: "$" }),
   v("COSTO_DIRECTO", "Costo directo de obra", "partida", "formula", {
-    formula: "P_TERRACERIAS + P_AGUA_DRENAJE + P_PAVIMENTOS + P_PLUVIAL + P_ELECTRICO + P_EQUIPAMIENTO + P_BARDA + P_CASETAS",
+    formula: "P_TERRACERIAS + P_AGUA_DRENAJE + P_PAVIMENTOS + P_PLUVIAL + P_ELECTRICO + P_EQUIPAMIENTO +  P_CASETAS",
     unidad: "$", nota: "Suma de las ocho partidas" }),
 
   v("PCT_INDIRECTOS", "Indirectos de campo y oficina", "parametro", "valor", { valor: 12, unidad: "%" }),
@@ -197,7 +195,6 @@ const SEMILLA = [
   v("COSTO_POR_LOTE", "Costo por lote", "resultado", "formula", { formula: "INVERSION_SIN_IVA / N_LOTES", unidad: "$/lote" }),
   v("COSTO_POR_HA", "Costo por hectárea bruta", "resultado", "formula", { formula: "INVERSION_SIN_IVA / HECTAREAS", unidad: "$/ha" }),
   v("COSTO_ML_VIALIDAD", "Costo por metro de vialidad", "resultado", "formula", { formula: "INVERSION_SIN_IVA / L_VIALIDAD", unidad: "$/m" }),
-  v("COSTO_ML_BARDA", "Costo directo por metro de barda", "resultado", "formula", { formula: "P_BARDA / L_BARDA", unidad: "$/m" }),
   v("INGRESO_ESTIMADO", "Ingreso estimado por venta", "resultado", "formula", { formula: "S_VENDIBLE * PRECIO_VENTA_M2", unidad: "$", supuesto: true }),
   v("UTILIDAD_PROYECTO", "Utilidad bruta del desarrollo", "resultado", "formula", { formula: "INGRESO_ESTIMADO - INVERSION_SIN_IVA", unidad: "$", destacado: true }),
   v("MARGEN", "Margen bruto sobre ingreso", "resultado", "formula", { formula: "UTILIDAD_PROYECTO / INGRESO_ESTIMADO * 100", unidad: "%", destacado: true }),
