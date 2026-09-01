@@ -6,7 +6,7 @@
 <title>Fracción 4 · Altamira Logistics — Modelo de variables</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+<script src="https://unpkg.com/htm@3.1.1/dist/htm.umd.js"></script>
 <style>
 :root{--papel:#EDEFF0;--panel:#fff;--tinta:#14212B;--tinta2:#4A5A66;--regla:#CBD2D6;--regla2:#9AA6AE;
 --azul:#22536E;--azulS:#E4EBEF;--verde:#0E6E5E;--verdeS:#E0EFEB;--ambar:#9A6414;--ambarS:#F5EBDA;--rojo:#8C2F2A;--rojoS:#F6E7E6;}
@@ -37,7 +37,7 @@ nav{display:flex;flex-wrap:wrap;gap:4px;margin:16px 0 18px}
 .card{background:var(--panel);border:1px solid var(--regla)}
 .pad{padding:16px}
 .cols{display:grid;grid-template-columns:minmax(0,1fr) 344px;gap:20px}
-&#64;media(max-width:980px){.cols{grid-template-columns:1fr}}
+@media(max-width:980px){.cols{grid-template-columns:1fr}}
 .grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(215px,1fr))}
 .vrow{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:7px 12px;
  background:none;border:none;border-top:1px solid var(--regla);cursor:pointer;font-family:inherit;font-size:14px}
@@ -93,13 +93,14 @@ tr.fuerte td{font-weight:600}
 .scroll button{display:block;width:100%;text-align:left;padding:3px 7px;font-size:12px;background:none;
  border:none;cursor:pointer;font-family:ui-monospace,Consolas,monospace}
 .scroll button:hover{background:#F2F4F5}
-&#64;media print{nav,.btn,.noprint{display:none!important}body{background:#fff}.card{border:none}}
+@media print{nav,.btn,.noprint{display:none!important}body{background:#fff}.card{border:none}}
 </style>
 </head>
 <body>
 <div id="raiz" style="padding:48px;text-align:center;color:#4A5A66">Cargando el modelo…</div>
-<script type="text/babel" data-presets="react">
-const { useState, useMemo, useEffect } = React;
+<script>
+const { useState, useMemo, useEffect, createElement } = React;
+const html = htm.bind(createElement);
 
 /* ---------- almacenamiento tolerante a file:// ---------- */
 const mem = {};
@@ -187,4 +188,573 @@ const SEMILLA = [
   v("OBRA_CONTRATADA", "Precio de obra contratada", "resultado", "formula", {
     formula: "COSTO_DIRECTO + INDIRECTOS + FINANCIAMIENTO + UTILIDAD", unidad: "$" }),
   v("INVERSION_SIN_IVA", "Inversión total antes de IVA", "resultado", "formula", {
-    formula: "OBRA_CONTRATADA + PROYECTOS + LICENCIAS + SUPERVISION + CONTINGENCIA + APORTACION_...</script></body></html>
+    formula: "OBRA_CONTRATADA + PROYECTOS + LICENCIAS + SUPERVISION + CONTINGENCIA + APORTACION_CFE + COSTO_TERRENO",
+    unidad: "$", destacado: true }),
+  v("IVA", "IVA", "resultado", "porcentaje", { baseKey: "INVERSION_SIN_IVA", pct: "PCT_IVA", unidad: "$" }),
+  v("INVERSION_TOTAL", "Inversión total con IVA", "resultado", "formula", { formula: "INVERSION_SIN_IVA + IVA", unidad: "$", destacado: true }),
+  v("COSTO_M2_BRUTO", "Costo por m² de superficie total", "resultado", "formula", { formula: "INVERSION_SIN_IVA / S_TOTAL", unidad: "$/m²", destacado: true }),
+  v("COSTO_M2_VENDIBLE", "Costo por m² vendible", "resultado", "formula", { formula: "INVERSION_SIN_IVA / S_VENDIBLE", unidad: "$/m²", destacado: true }),
+  v("COSTO_POR_LOTE", "Costo por lote", "resultado", "formula", { formula: "INVERSION_SIN_IVA / N_LOTES", unidad: "$/lote" }),
+  v("COSTO_POR_HA", "Costo por hectárea bruta", "resultado", "formula", { formula: "INVERSION_SIN_IVA / HECTAREAS", unidad: "$/ha" }),
+  v("COSTO_ML_VIALIDAD", "Costo por metro de vialidad", "resultado", "formula", { formula: "INVERSION_SIN_IVA / L_VIALIDAD", unidad: "$/m" }),
+  v("COSTO_ML_BARDA", "Costo directo por metro de barda", "resultado", "formula", { formula: "P_BARDA / L_BARDA", unidad: "$/m" }),
+  v("INGRESO_ESTIMADO", "Ingreso estimado por venta", "resultado", "formula", { formula: "S_VENDIBLE * PRECIO_VENTA_M2", unidad: "$", supuesto: true }),
+  v("UTILIDAD_PROYECTO", "Utilidad bruta del desarrollo", "resultado", "formula", { formula: "INGRESO_ESTIMADO - INVERSION_SIN_IVA", unidad: "$", destacado: true }),
+  v("MARGEN", "Margen bruto sobre ingreso", "resultado", "formula", { formula: "UTILIDAD_PROYECTO / INGRESO_ESTIMADO * 100", unidad: "%", destacado: true }),
+  v("PRECIO_EQUILIBRIO", "Precio de venta de equilibrio", "resultado", "formula", {
+    formula: "INVERSION_SIN_IVA / S_VENDIBLE", unidad: "$/m²", nota: "Precio mínimo por m² vendible para no perder" }),
+];
+
+/* ---------- motor ---------- */
+function calcular(vars) {
+  const scope = {}, estado = {};
+  const pend = new Set(vars.map((x) => x.key));
+  let vueltas = 0;
+  while (pend.size && vueltas < 60) {
+    vueltas++;
+    let avanzo = false;
+    for (const x of vars) {
+      if (!pend.has(x.key)) continue;
+      try {
+        let val;
+        if (x.tipo === "valor") {
+          val = Number(x.valor) || 0;
+        } else if (x.tipo === "porcentaje") {
+          val = (evalExpr(x.baseKey, scope) * evalExpr(x.pct, scope)) / 100;
+        } else {
+          val = evalExpr(x.formula, scope);
+        }
+        if (typeof val !== "number" || !isFinite(val)) throw new Error("no numérico");
+        scope[x.key] = val;
+        estado[x.key] = { valor: val };
+        pend.delete(x.key);
+        avanzo = true;
+      } catch (e) { /* depende de algo no resuelto todavía */ }
+    }
+    if (!avanzo) break;
+  }
+  for (const k of pend) estado[k] = { valor: null, error: "No se puede calcular: referencia circular o variable inexistente" };
+  return { scope, estado };
+}
+
+function deps(x, claves) {
+  const txt = x.tipo === "formula" ? x.formula : x.tipo === "porcentaje" ? (x.baseKey + " " + x.pct) : "";
+  return claves.filter((k) => new RegExp("\\b" + k + "\\b").test(txt || ""));
+}
+
+/* ---------- formato ---------- */
+const nf = (d) => new Intl.NumberFormat("es-MX", { minimumFractionDigits: d, maximumFractionDigits: d });
+function fmt(val, unidad) {
+  if (val === null || val === undefined || !isFinite(val)) return "—";
+  if (unidad === "$") return "$" + nf(0).format(Math.round(val));
+  if (unidad === "%") return nf(2).format(val) + "%";
+  if (unidad && unidad.indexOf("$/") === 0) return "$" + nf(Math.abs(val) > 1000 ? 0 : 2).format(val);
+  if (unidad === "lote" || unidad === "kVA") return nf(0).format(val);
+  return nf(2).format(val);
+}
+function corto(val) {
+  if (!isFinite(val)) return "—";
+  const a = Math.abs(val);
+  if (a >= 1e6) return (val / 1e6).toFixed(1) + " M";
+  if (a >= 1e3) return (val / 1e3).toFixed(0) + " k";
+  return val.toFixed(0);
+}
+
+/* ---------- piezas ---------- */
+function Campo({ etiqueta, children }) {
+  return html`<label className="f"><span>${etiqueta}</span>${children}</label>`;
+}
+function Chips({ titulo, items, onIr, porKey, scope }) {
+  if (!items.length) return null;
+  return html`
+    <div style=${{ marginBottom: 10 }}>
+      <div className="mini" style=${{ marginBottom: 3 }}>${titulo}</div>
+      <div>${items.map((k) => html`
+        <button key=${k} className="chip" onClick=${() => onIr(k)}
+          title=${(porKey[k] ? porKey[k].nombre : k) + ": " + fmt(scope[k], porKey[k] && porKey[k].unidad)}>${k}</button>
+      `)}</div>
+    </div>
+  `;
+}
+function Barras({ datos }) {
+  const max = Math.max(...datos.map((d) => Math.abs(d.valor)), 1);
+  return html`
+    <div className="bars">
+      ${datos.map((d) => html`
+        <div className="bar" key=${d.key || d.nombre}>
+          <div className="lbl" title=${d.nombre}>${d.nombre}</div>
+          <div className="track"><div className="fill" style=${{ width: (Math.abs(d.valor) / max) * 100 + "%" }} /></div>
+          <div className="val num">${corto(d.valor)}</div>
+        </div>
+      `)}
+    </div>
+  `;
+}
+function Tornado({ datos }) {
+  const max = Math.max(...datos.map((d) => Math.max(Math.abs(d.baja), Math.abs(d.sube))), 1);
+  return html`
+    <div className="bars">
+      ${datos.map((d) => html`
+        <div className="torn" key=${d.key}>
+          <div className="lbl" title=${d.nombre}>${d.nombre}</div>
+          <div className="half L">
+            <div className="seg2" style=${{ width: (Math.abs(Math.min(d.baja, 0)) / max) * 100 + "%", background: "var(--verde)" }} />
+          </div>
+          <div className="half">
+            <div className="seg2" style=${{ width: (Math.abs(Math.max(d.sube, 0)) / max) * 100 + "%", background: "var(--ambar)" }} />
+          </div>
+          <div className="val num" style=${{ width: 96, textAlign: "right", fontSize: 13 }}>±${corto(d.amplitud / 2)}</div>
+        </div>
+      `)}
+    </div>
+  `;
+}
+function Tabla({ filas, total }) {
+  return html`
+    <table><tbody>
+      ${filas.map((f, i) => html`
+        <tr key=${i} className=${f[2] ? "fuerte" : ""}>
+          <td>${f[0]}</td>
+          <td className="r mini num" style=${{ width: 78 }}>
+            ${total && isFinite(f[1]) ? ((f[1] / total) * 100).toFixed(1) + "%" : ""}
+          </td>
+          <td className="r num" style=${{ width: 148 }}>${fmt(f[1], "$")}</td>
+        </tr>
+      `)}
+    </tbody></table>
+  `;
+}
+
+function App() {
+  const [vars, setVars] = useState(SEMILLA);
+  const [vista, setVista] = useState("variables");
+  const [sel, setSel] = useState("INVERSION_SIN_IVA");
+  const [escenarios, setEscenarios] = useState([]);
+  const [objetivo, setObjetivo] = useState("INVERSION_SIN_IVA");
+  const [rango, setRango] = useState(20);
+  const [aviso, setAviso] = useState(null);
+
+  const claves = useMemo(() => vars.map((x) => x.key), [vars]);
+  const { scope, estado } = useMemo(() => calcular(vars), [vars]);
+  const porKey = useMemo(() => Object.fromEntries(vars.map((x) => [x.key, x])), [vars]);
+
+  useEffect(() => {
+    const raw = store.get("modelo-f4");
+    if (raw) { try { const d = JSON.parse(raw); if (d.vars && d.vars.length) setVars(d.vars); if (d.escenarios) setEscenarios(d.escenarios); } catch (e) {} }
+  }, []);
+
+  const notificar = (t, err) => { setAviso({ t, err }); setTimeout(() => setAviso(null), 3200); };
+  const guardar = () => {
+    const ok = store.set("modelo-f4", JSON.stringify({ vars, escenarios }));
+    ok ? notificar("Modelo guardado en este navegador")
+       : notificar("Tu navegador bloquea el guardado al abrir el archivo directamente. Usa Exportar para conservar el modelo.", true);
+  };
+  const editar = (key, campo, valor) => setVars((p) => p.map((x) => (x.key === key ? { ...x, [campo]: valor } : x)));
+
+  const agregar = (grupo) => {
+    let n = 1; while (claves.indexOf("NUEVA_" + n) >= 0) n++;
+    const nv = v("NUEVA_" + n, "Variable sin nombre", grupo, grupo === "costo" ? "porcentaje" : "valor",
+      { unidad: grupo === "medicion" ? "m²" : grupo === "parametro" ? "%" : "$", baseKey: "COSTO_DIRECTO", pct: "0" });
+    setVars((p) => [...p, nv]); setSel(nv.key); setVista("variables");
+  };
+  const usos = (key) => vars.filter((x) => x.key !== key && deps(x, claves).indexOf(key) >= 0);
+  const eliminar = (key) => {
+    const u = usos(key);
+    if (u.length) return notificar("No se puede borrar: la usan " + u.map((x) => x.key).join(", "), true);
+    setVars((p) => p.filter((x) => x.key !== key));
+    if (sel === key) setSel("INVERSION_SIN_IVA");
+  };
+  const renombrar = (viejo, nuevo) => {
+    const limpio = nuevo.toUpperCase().replace(/[^A-Z0-9_]/g, "_");
+    if (!limpio || /^[0-9]/.test(limpio) || (limpio !== viejo && claves.indexOf(limpio) >= 0)) return;
+    const re = new RegExp("\\b" + viejo + "\\b", "g");
+    setVars((p) => p.map((x) => ({ ...x,
+      key: x.key === viejo ? limpio : x.key,
+      formula: (x.formula || "").replace(re, limpio),
+      baseKey: x.baseKey === viejo ? limpio : x.baseKey,
+      pct: String(x.pct || "").replace(re, limpio) })));
+    if (sel === viejo) setSel(limpio);
+  };
+
+  const exportar = () => {
+    const blob = new Blob([JSON.stringify({ vars, escenarios }, null, 2)], { type: "application/json" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "modelo-fraccion-4.json"; a.click();
+  };
+  const importar = (ev) => {
+    const f = ev.target.files[0]; if (!f) return;
+    const r = new FileReader();
+    r.onload = () => { try { const d = JSON.parse(r.result);
+      if (d.vars) setVars(d.vars); if (d.escenarios) setEscenarios(d.escenarios);
+      notificar("Modelo importado"); } catch (e) { notificar("El archivo no es un modelo válido", true); } };
+    r.readAsText(f); ev.target.value = "";
+  };
+
+  const guardarEsc = () => { setEscenarios((p) => [...p, { nombre: "Escenario " + (p.length + 1), vars: JSON.parse(JSON.stringify(vars)) }]); notificar("Escenario capturado"); };
+
+  const partidas = useMemo(() => vars.filter((x) => x.grupo === "partida" && x.key !== "COSTO_DIRECTO")
+    .map((x) => ({ key: x.key, nombre: x.nombre, valor: scope[x.key] || 0 }))
+    .sort((a, b) => b.valor - a.valor), [vars, scope]);
+
+  const tornado = useMemo(() => {
+    const base = scope[objetivo];
+    if (!isFinite(base)) return [];
+    return vars.filter((x) => x.tipo === "valor" && x.key !== objetivo).map((x) => {
+      const cl = (m) => vars.map((y) => (y.key === x.key ? { ...y, valor: Number(y.valor) * m } : y));
+      const alto = calcular(cl(1 + rango / 100)).scope[objetivo];
+      const bajo = calcular(cl(1 - rango / 100)).scope[objetivo];
+      const sube = isFinite(alto) ? alto - base : 0, baja = isFinite(bajo) ? bajo - base : 0;
+      return { key: x.key, nombre: x.nombre, sube, baja, amplitud: Math.abs(sube - baja) };
+    }).filter((f) => f.amplitud > 0.005).sort((a, b) => b.amplitud - a.amplitud).slice(0, 12);
+  }, [vars, scope, objetivo, rango]);
+
+  const sv = porKey[sel];
+  const T = [["variables","Variables"],["indicadores","Indicadores"],["sensibilidad","Sensibilidad"],["escenarios","Escenarios"],["reporte","Reporte"]];
+
+  return html`
+    <div className="wrap">
+      <header className="top">
+        <div>
+          <h1>Fracción 4 · Altamira Logistics</h1>
+          <p className="sub">Modelo de variables para decisiones de inversión · NUEVALTA, Altamira, Tamaulipas</p>
+        </div>
+        <div style=${{ display: "flex", gap: 26, alignItems: "flex-end" }}>
+          <div className="cifra"><div className="mini">Inversión antes de IVA</div><div className="v num">${fmt(scope.INVERSION_SIN_IVA, "$")}</div></div>
+          <div className="cifra"><div className="mini">Costo por m² vendible</div><div className="v num">${fmt(scope.COSTO_M2_VENDIBLE, "$/m²")}</div></div>
+          <div className="cifra"><div className="mini">Margen bruto</div>
+            <div className="v num" style=${{ color: scope.MARGEN > 0 ? "var(--verde)" : "var(--rojo)" }}>${fmt(scope.MARGEN, "%")}</div></div>
+        </div>
+      </header>
+
+      <nav>
+        ${T.map(([id, t]) => html`<button key=${id} className=${"tab" + (vista === id ? " on" : "")} onClick=${() => setVista(id)}>${t}</button>`)}
+        <div className="grow" />
+        <button className="btn" onClick=${guardar}>Guardar</button>
+        <button className="btn" onClick=${exportar}>Exportar</button>
+        <label className="btn" style=${{ display: "inline-block" }}>
+          Importar<input type="file" accept=".json" onChange=${importar} style=${{ display: "none" }} />
+        </label>
+      </nav>
+
+      ${aviso && html`<div className=${"aviso " + (aviso.err ? "err" : "ok")}>${aviso.t}</div>`}
+
+      ${vista === "variables" && html`
+        <div className="cols">
+          <div>
+            ${GRUPOS.map((g) => {
+              const lista = vars.filter((x) => x.grupo === g.id);
+              return html`
+                <section key=${g.id} style=${{ marginBottom: 22 }}>
+                  <div style=${{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+                    <h2 style=${{ color: g.color }}>${g.nombre}</h2>
+                    <button className="btn mini" onClick=${() => agregar(g.id)}>+ Agregar</button>
+                  </div>
+                  <p className="mini" style=${{ margin: "3px 0 7px" }}>${g.ayuda}</p>
+                  <div className="card">
+                    ${lista.map((x) => {
+                      const st = estado[x.key] || {};
+                      return html`
+                        <button key=${x.key} className=${"vrow" + (sel === x.key ? " on" : "")} onClick=${() => setSel(x.key)}>
+                          <span className="k" style=${{ color: g.color }}>${x.key}</span>
+                          <span className="n">${x.nombre}</span>
+                          ${x.supuesto && html`<span className="tag sup">supuesto</span>`}
+                          <span className="v num">${st.error ? html`<em style=${{ color: "var(--rojo)" }}>error</em>` : fmt(st.valor, x.unidad)}</span>
+                        </button>
+                      `;
+                    })}
+                    ${!lista.length && html`<div style=${{ padding: "10px 12px" }} className="mini">Sin variables en este grupo.</div>`}
+                  </div>
+                </section>
+              `;
+            })}
+          </div>
+
+          <aside className="card pad sticky">
+            ${!sv ? html`<p className="mini">Elige una variable para editarla.</p>` : html`
+              <div>
+                <div style=${{ display: "flex", justifyContent: "space-between", marginBottom: 10 }}>
+                  <h3 style=${{ margin: 0 }}>Editar variable</h3>
+                  <button className="btn mini" style=${{ color: "var(--rojo)" }} onClick=${() => eliminar(sv.key)}>Borrar</button>
+                </div>
+                <${Campo} etiqueta="Clave (se usa en fórmulas)">
+                  <input className="mono" value=${sv.key} onChange=${(e) => renombrar(sv.key, e.target.value)} />
+                <//>
+                <${Campo} etiqueta="Nombre">
+                  <input value=${sv.nombre} onChange=${(e) => editar(sv.key, "nombre", e.target.value)} />
+                <//>
+                <div style=${{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+                  <${Campo} etiqueta="Grupo">
+                    <select value=${sv.grupo} onChange=${(e) => editar(sv.key, "grupo", e.target.value)}>
+                      ${GRUPOS.map((g) => html`<option key=${g.id} value=${g.id}>${g.nombre}</option>`)}
+                    </select>
+                  <//>
+                  <${Campo} etiqueta="Unidad">
+                    <select value=${sv.unidad} onChange=${(e) => editar(sv.key, "unidad", e.target.value)}>
+                      ${["$", "%", "m²", "m", "ha", "lote", "kVA", "$/m²", "$/m", "$/ha", "$/lote", "$/kVA", ""].map((u) =>
+                        html`<option key=${u} value=${u}>${u || "sin unidad"}</option>`)}
+                    </select>
+                  <//>
+                </div>
+                <${Campo} etiqueta="Cómo se obtiene">
+                  <div className="seg">
+                    ${[["valor", "Valor fijo"], ["porcentaje", "% de otra"], ["formula", "Fórmula"]].map(([t, l]) =>
+                      html`<button key=${t} className=${sv.tipo === t ? "on" : ""} onClick=${() => editar(sv.key, "tipo", t)}>${l}</button>`)}
+                  </div>
+                <//>
+
+                ${sv.tipo === "valor" && html`
+                  <${Campo} etiqueta="Valor">
+                    <input type="number" className="num" value=${sv.valor}
+                      onChange=${(e) => editar(sv.key, "valor", e.target.value === "" ? 0 : parseFloat(e.target.value))} />
+                  <//>
+                `}
+                ${sv.tipo === "porcentaje" && html`
+                  <div>
+                    <${Campo} etiqueta="Se calcula sobre">
+                      <select className="mono" value=${sv.baseKey} onChange=${(e) => editar(sv.key, "baseKey", e.target.value)}>
+                        ${claves.filter((k) => k !== sv.key).map((k) => html`<option key=${k} value=${k}>${k}</option>`)}
+                      </select>
+                    <//>
+                    <${Campo} etiqueta="Porcentaje (número o clave de variable)">
+                      <input className="mono" value=${sv.pct} onChange=${(e) => editar(sv.key, "pct", e.target.value)} />
+                    <//>
+                  </div>
+                `}
+                ${sv.tipo === "formula" && html`
+                  <${Campo} etiqueta="Fórmula">
+                    <textarea className="mono" rows=${3} value=${sv.formula} onChange=${(e) => editar(sv.key, "formula", e.target.value)} />
+                  <//>
+                `}
+                <${Campo} etiqueta="Nota">
+                  <input value=${sv.nota} onChange=${(e) => editar(sv.key, "nota", e.target.value)} />
+                <//>
+                <label style=${{ display: "flex", gap: 7, alignItems: "center", fontSize: 13, marginBottom: 10 }}>
+                  <input type="checkbox" style=${{ width: "auto" }} checked=${!!sv.supuesto}
+                    onChange=${(e) => editar(sv.key, "supuesto", e.target.checked)} />
+                  Marcar como supuesto por confirmar
+                </label>
+                <label style=${{ display: "flex", gap: 7, alignItems: "center", fontSize: 13, marginBottom: 10 }}>
+                  <input type="checkbox" style=${{ width: "auto" }} checked=${!!sv.destacado}
+                    onChange=${(e) => editar(sv.key, "destacado", e.target.checked)} />
+                  Mostrar como indicador destacado
+                </label>
+
+                <div style=${{ borderTop: "1px solid var(--regla)", paddingTop: 9, marginBottom: 12 }}>
+                  <div className="mini">Valor calculado</div>
+                  <div className="num" style=${{ fontSize: 21, fontWeight: 600 }}>
+                    ${estado[sv.key] && estado[sv.key].error
+                      ? html`<span style=${{ color: "var(--rojo)", fontSize: 13 }}>${estado[sv.key].error}</span>`
+                      : fmt(estado[sv.key] && estado[sv.key].valor, sv.unidad)}
+                  </div>
+                </div>
+
+                ${sv.tipo !== "valor" && html`<${Chips} titulo="Usa estas variables" items=${deps(sv, claves)} onIr=${setSel} porKey=${porKey} scope=${scope} />`}
+                <${Chips} titulo="La usan" items=${usos(sv.key).map((u) => u.key)} onIr=${setSel} porKey=${porKey} scope=${scope} />
+
+                ${sv.tipo === "formula" && html`
+                  <div>
+                    <div className="mini" style=${{ marginBottom: 3 }}>Insertar variable en la fórmula</div>
+                    <div className="scroll">
+                      ${claves.filter((k) => k !== sv.key).map((k) =>
+                        html`<button key=${k} onClick=${() => editar(sv.key, "formula", (sv.formula || "") + " " + k)}>${k}</button>`)}
+                    </div>
+                  </div>
+                `}
+              </div>
+            `}
+          </aside>
+        </div>
+      `}
+
+      ${vista === "indicadores" && html`
+        <div>
+          <div className="grid" style=${{ marginBottom: 20 }}>
+            ${vars.filter((x) => x.destacado).map((x) => html`
+              <div key=${x.key} className="card pad">
+                <div className="mini">${x.nombre}</div>
+                <div className="num" style=${{ fontSize: 23, fontWeight: 600, marginTop: 3,
+                  color: (x.key === "MARGEN" || x.key === "UTILIDAD_PROYECTO") ? (scope[x.key] > 0 ? "var(--verde)" : "var(--rojo)") : "var(--tinta)" }}>
+                  ${fmt(scope[x.key], x.unidad)}
+                </div>
+                ${x.nota && html`<div className="mini" style=${{ marginTop: 3 }}>${x.nota}</div>`}
+              </div>
+            `)}
+          </div>
+          <section className="card pad" style=${{ marginBottom: 20 }}>
+            <h2 style=${{ marginBottom: 12 }}>Costo directo por partida</h2>
+            <${Barras} datos=${partidas} />
+          </section>
+          <section className="card pad">
+            <h2 style=${{ marginBottom: 12 }}>Del costo directo a la inversión</h2>
+            <${Tabla} total=${scope.INVERSION_SIN_IVA} filas=${[
+              ["Costo directo de obra", scope.COSTO_DIRECTO],
+              ["Indirectos", scope.INDIRECTOS], ["Financiamiento", scope.FINANCIAMIENTO],
+              ["Utilidad del contratista", scope.UTILIDAD],
+              ["Precio de obra contratada", scope.OBRA_CONTRATADA, true],
+              ["Estudios y proyectos", scope.PROYECTOS], ["Licencias y permisos", scope.LICENCIAS],
+              ["Supervisión y gerencia", scope.SUPERVISION], ["Contingencia", scope.CONTINGENCIA],
+              ["Aportación a CFE", scope.APORTACION_CFE], ["Costo del terreno", scope.COSTO_TERRENO],
+              ["Inversión antes de IVA", scope.INVERSION_SIN_IVA, true],
+              ["IVA", scope.IVA], ["Inversión total con IVA", scope.INVERSION_TOTAL, true]]} />
+          </section>
+        </div>
+      `}
+
+      ${vista === "sensibilidad" && html`
+        <div>
+          <div className="card pad" style=${{ display: "flex", flexWrap: "wrap", gap: 20, alignItems: "flex-end", marginBottom: 18 }}>
+            <div style=${{ minWidth: 280 }}>
+              <${Campo} etiqueta="Qué quiero medir">
+                <select value=${objetivo} onChange=${(e) => setObjetivo(e.target.value)}>
+                  ${vars.filter((x) => x.tipo !== "valor").map((x) => html`<option key=${x.key} value=${x.key}>${x.nombre}</option>`)}
+                </select>
+              <//>
+            </div>
+            <div>
+              <${Campo} etiqueta=${"Variación aplicada: ±" + rango + "%"}>
+                <input type="range" min="5" max="50" step="5" value=${rango}
+                  onChange=${(e) => setRango(parseInt(e.target.value))} style=${{ width: 220 }} />
+              <//>
+            </div>
+            <div className="grow" />
+            <div className="num" style=${{ fontSize: 15 }}>
+              Valor base: <strong>${fmt(scope[objetivo], porKey[objetivo] && porKey[objetivo].unidad)}</strong>
+            </div>
+          </div>
+          <section className="card pad">
+            <h2>Qué mueve más el resultado</h2>
+            <p className="mini" style=${{ margin: "4px 0 14px" }}>
+              Cada barra muestra cuánto cambia ${porKey[objetivo] ? porKey[objetivo].nombre.toLowerCase() : ""} si esa variable sube o baja ${rango}%.
+            </p>
+            ${tornado.length ? html`<${Tornado} datos=${tornado} />` : html`<p className="mini">Ninguna variable de valor fijo afecta este resultado.</p>`}
+            <div className="mini" style=${{ display: "flex", gap: 20, marginTop: 12 }}>
+              <span><span style=${{ display: "inline-block", width: 11, height: 11, background: "var(--verde)", marginRight: 5 }} />Si la variable baja ${rango}%</span>
+              <span><span style=${{ display: "inline-block", width: 11, height: 11, background: "var(--ambar)", marginRight: 5 }} />Si la variable sube ${rango}%</span>
+            </div>
+          </section>
+        </div>
+      `}
+
+      ${vista === "escenarios" && html`
+        <div>
+          <div style=${{ display: "flex", gap: 14, alignItems: "center", marginBottom: 16 }}>
+            <button className="btn p" onClick=${guardarEsc}>Capturar estado actual</button>
+            <span className="mini">Modifica variables, captura, y compara las corridas.</span>
+          </div>
+          ${!escenarios.length ? html`
+            <div className="card pad mini" style=${{ textAlign: "center", padding: 40 }}>
+              Aún no hay escenarios. Captura el estado actual para empezar a comparar.
+            </div>
+          ` : html`
+            <div>
+              <div className="card" style=${{ overflowX: "auto", marginBottom: 20 }}>
+                <table>
+                  <thead><tr>
+                    <th>Indicador</th><th className="r">Actual</th>
+                    ${escenarios.map((e, i) => html`<th key=${i} className="r">
+                      <input value=${e.nombre} style=${{ textAlign: "right", border: "none", borderBottom: "1px solid var(--regla)", padding: 2 }}
+                        onChange=${(ev) => setEscenarios((p) => p.map((x, j) => j === i ? { ...x, nombre: ev.target.value } : x))} />
+                    </th>`)}
+                  </tr></thead>
+                  <tbody>
+                    ${vars.filter((x) => x.destacado).map((x) => html`
+                      <tr key=${x.key}>
+                        <td>${x.nombre}</td>
+                        <td className="r num" style=${{ fontWeight: 500 }}>${fmt(scope[x.key], x.unidad)}</td>
+                        ${escenarios.map((e, i) => {
+                          const s = calcular(e.vars).scope;
+                          const d = (s[x.key] || 0) - (scope[x.key] || 0);
+                          return html`<td key=${i} className="r num">${fmt(s[x.key], x.unidad)}
+                            ${Math.abs(d) > 0.01 && html`<div className="mini" style=${{ color: d > 0 ? "var(--ambar)" : "var(--verde)" }}>
+                              ${d > 0 ? "+" : ""}${corto(d)}</div>`}
+                          </td>`;
+                        })}
+                      </tr>
+                    `)}
+                    <tr><td /><td />
+                      ${escenarios.map((_, i) => html`<td key=${i} className="r">
+                        <button className="btn mini" onClick=${() => { setVars(JSON.parse(JSON.stringify(escenarios[i].vars))); notificar("Escenario cargado"); }}>Cargar</button>{" "}
+                        <button className="btn mini" style=${{ color: "var(--rojo)" }} onClick=${() => setEscenarios((p) => p.filter((_, j) => j !== i))}>Borrar</button>
+                      </td>`)}
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <section className="card pad">
+                <h2 style=${{ marginBottom: 12 }}>Inversión antes de IVA por escenario</h2>
+                ${(() => {
+                  const d = [{ nombre: "Actual", valor: scope.INVERSION_SIN_IVA || 0, act: true },
+                    ...escenarios.map((e) => ({ nombre: e.nombre, valor: calcular(e.vars).scope.INVERSION_SIN_IVA || 0 }))];
+                  const max = Math.max(...d.map((x) => x.valor), 1);
+                  return html`<div className="vbars">${d.map((x, i) => html`
+                    <div className="vbar" key=${i}>
+                      <div className="num mini">${corto(x.valor)}</div>
+                      <div className="b" style=${{ height: (x.valor / max) * 100 + "%", background: x.act ? "var(--tinta)" : "var(--azul)" }} />
+                      <div className="cap">${x.nombre}</div>
+                    </div>`)}</div>`;
+                })()}
+              </section>
+            </div>
+          `}
+        </div>
+      `}
+
+      ${vista === "reporte" && html`
+        <div className="card">
+          <div style=${{ padding: "22px 22px 0" }}>
+            <h2 style=${{ fontSize: 20 }}>Resumen de inversión</h2>
+            <p className="sub">Fracción 4 · Altamira Logistics · ${new Date().toLocaleDateString("es-MX", { day: "numeric", month: "long", year: "numeric" })}</p>
+          </div>
+          <div style=${{ padding: "16px 22px", display: "grid", gap: 16, gridTemplateColumns: "repeat(auto-fit,minmax(175px,1fr))" }}>
+            ${["INVERSION_SIN_IVA", "COSTO_M2_VENDIBLE", "COSTO_POR_LOTE", "MARGEN"].map((k) => html`
+              <div className="kpi" key=${k}>
+                <div className="mini">${porKey[k] && porKey[k].nombre}</div>
+                <div className="v num">${fmt(scope[k], porKey[k] && porKey[k].unidad)}</div>
+              </div>
+            `)}
+          </div>
+          <div style=${{ padding: "0 22px 18px" }}>
+            <h3>Composición del costo directo</h3>
+            <${Barras} datos=${partidas} />
+          </div>
+          <div style=${{ padding: "0 22px 18px" }}>
+            <h3>Integración</h3>
+            <${Tabla} total=${scope.INVERSION_SIN_IVA} filas=${[
+              ["Costo directo de obra", scope.COSTO_DIRECTO],
+              ["Indirectos, financiamiento y utilidad", (scope.INDIRECTOS || 0) + (scope.FINANCIAMIENTO || 0) + (scope.UTILIDAD || 0)],
+              ["Estudios, licencias y supervisión", (scope.PROYECTOS || 0) + (scope.LICENCIAS || 0) + (scope.SUPERVISION || 0)],
+              ["Contingencia", scope.CONTINGENCIA], ["Aportación a CFE", scope.APORTACION_CFE],
+              ["Costo del terreno", scope.COSTO_TERRENO],
+              ["Inversión antes de IVA", scope.INVERSION_SIN_IVA, true]]} />
+          </div>
+          <div style=${{ padding: "0 22px 24px" }}>
+            <h3>Supuestos que sostienen estas cifras</h3>
+            <ul className="lista">
+              ${vars.filter((x) => x.supuesto).map((x) => html`
+                <li key=${x.key}>
+                  <span style=${{ flex: 1 }}>${x.nombre}${x.nota ? " — " + x.nota : ""}</span>
+                  <span className="num">${fmt(scope[x.key], x.unidad)}</span>
+                </li>
+              `)}
+            </ul>
+            <p className="mini" style=${{ marginTop: 14 }}>
+              Estimado paramétrico clase 4-5 (AACE) sobre plan maestro; rango esperado de −20% a +30%.
+              Precios base de las cotizaciones DLG y ELYEIVER del Fracc. Amaranta, actualizados a agosto de 2026 con el INPP-Construcción del INEGI.
+            </p>
+          </div>
+        </div>
+      `}
+    </div>
+  `;
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  const rootElement = document.getElementById("raiz");
+  if (rootElement) {
+    ReactDOM.createRoot(rootElement).render(html`<${App} />`);
+  }
+});
+</script>
+</body>
+</html>
