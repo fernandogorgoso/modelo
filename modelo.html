@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Fracción 4 · Altamira Logistics — Modelo de variables</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+<style>
+:root{--papel:#EDEFF0;--panel:#fff;--tinta:#14212B;--tinta2:#4A5A66;--regla:#CBD2D6;--regla2:#9AA6AE;
+--azul:#22536E;--azulS:#E4EBEF;--verde:#0E6E5E;--verdeS:#E0EFEB;--ambar:#9A6414;--ambarS:#F5EBDA;--rojo:#8C2F2A;--rojoS:#F6E7E6;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--papel);color:var(--tinta);
+ font-family:ui-sans-serif,system-ui,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;font-size:14px;line-height:1.45}
+.wrap{max-width:1240px;margin:0 auto;padding:22px 20px 60px}
+.num{font-variant-numeric:tabular-nums}
+h1{font-size:23px;margin:0;letter-spacing:-.01em;font-weight:600}
+h2{font-size:16px;margin:0;font-weight:600}
+h3{font-size:14px;margin:0 0 8px;font-weight:600}
+.sub{color:var(--tinta2);font-size:13px;margin:4px 0 0}
+.mini{color:var(--tinta2);font-size:12px}
+header.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:18px;
+ padding-bottom:14px;border-bottom:2px solid var(--tinta)}
+.cifra{text-align:right}
+.cifra .v{font-size:20px;font-weight:600}
+nav{display:flex;flex-wrap:wrap;gap:4px;margin:16px 0 18px}
+.tab{padding:8px 16px;font-size:14px;font-weight:500;background:none;border:1px solid var(--regla);
+ color:var(--tinta2);cursor:pointer;font-family:inherit}
+.tab.on{background:var(--tinta);color:var(--papel);border-color:var(--tinta)}
+.btn{padding:7px 13px;font-size:13px;background:none;border:1px solid var(--regla);color:var(--tinta2);
+ cursor:pointer;font-family:inherit}
+.btn:hover{background:#fff}
+.btn.p{background:var(--tinta);color:var(--papel);border-color:var(--tinta)}
+.btn.mini{padding:3px 8px;font-size:12px}
+.grow{flex:1}
+.card{background:var(--panel);border:1px solid var(--regla)}
+.pad{padding:16px}
+.cols{display:grid;grid-template-columns:minmax(0,1fr) 344px;gap:20px}
+&#64;media(max-width:980px){.cols{grid-template-columns:1fr}}
+.grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(215px,1fr))}
+.vrow{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:7px 12px;
+ background:none;border:none;border-top:1px solid var(--regla);cursor:pointer;font-family:inherit;font-size:14px}
+.vrow:first-child{border-top:none}
+.vrow.on{background:var(--azulS)}
+.vrow .k{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:12px;width:158px;flex:none;
+ overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.vrow .n{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.vrow .v{width:132px;flex:none;text-align:right;font-weight:500}
+.tag{font-size:11px;padding:1px 6px;flex:none}
+.tag.sup{background:var(--ambarS);color:var(--ambar)}
+label.f{display:block;margin-bottom:10px}
+label.f>span{display:block;font-size:12px;color:var(--tinta2);margin-bottom:3px}
+input,select,textarea{width:100%;padding:5px 7px;font-size:13px;font-family:inherit;
+ border:1px solid var(--regla);background:#fff;color:var(--tinta)}
+input.mono,textarea.mono,select.mono{font-family:ui-monospace,SFMono-Regular,Consolas,monospace}
+.seg{display:flex;gap:3px}
+.seg button{flex:1;padding:5px;font-size:12px;background:none;border:1px solid var(--regla);
+ color:var(--tinta2);cursor:pointer;font-family:inherit}
+.seg button.on{background:var(--tinta);color:var(--papel);border-color:var(--tinta)}
+.chip{font-family:ui-monospace,Consolas,monospace;font-size:11px;padding:2px 6px;background:var(--azulS);
+ color:var(--azul);border:none;cursor:pointer;margin:0 3px 3px 0}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{text-align:left;padding:7px 12px;font-weight:600;border-bottom:1px solid var(--regla2)}
+td{padding:6px 12px;border-top:1px solid var(--regla)}
+td.r,th.r{text-align:right}
+tr.fuerte{background:var(--azulS)}
+tr.fuerte td{font-weight:600}
+.bars{display:flex;flex-direction:column;gap:7px}
+.bar{display:flex;align-items:center;gap:10px}
+.bar .lbl{width:250px;flex:none;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bar .track{flex:1;height:20px;background:#F2F4F5}
+.bar .fill{height:100%;background:var(--azul)}
+.bar .val{width:96px;flex:none;text-align:right;font-size:13px}
+.torn{display:flex;align-items:center;gap:8px}
+.torn .lbl{width:250px;flex:none;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.torn .half{flex:1;height:20px;display:flex}
+.torn .L{justify-content:flex-end;border-right:2px solid var(--tinta)}
+.torn .seg2{height:100%}
+.vbars{display:flex;align-items:flex-end;gap:18px;height:200px;padding-top:20px}
+.vbar{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%}
+.vbar .b{width:100%;background:var(--azul)}
+.vbar .cap{font-size:12px;margin-top:6px;text-align:center}
+.aviso{padding:9px 14px;margin-bottom:14px;font-size:13px}
+.aviso.ok{background:var(--verdeS);color:var(--verde)}
+.aviso.err{background:var(--rojoS);color:var(--rojo)}
+.sticky{position:sticky;top:16px;align-self:start}
+.lista li{display:flex;gap:14px;padding:5px 0;border-bottom:1px solid var(--regla);list-style:none}
+.lista{margin:0;padding:0}
+.kpi{border-top:2px solid var(--tinta);padding:10px 0}
+.kpi .v{font-size:24px;font-weight:600}
+.scroll{max-height:180px;overflow:auto;border:1px solid var(--regla)}
+.scroll button{display:block;width:100%;text-align:left;padding:3px 7px;font-size:12px;background:none;
+ border:none;cursor:pointer;font-family:ui-monospace,Consolas,monospace}
+.scroll button:hover{background:#F2F4F5}
+&#64;media print{nav,.btn,.noprint{display:none!important}body{background:#fff}.card{border:none}}
+</style>
+</head>
+<body>
+<div id="raiz" style="padding:48px;text-align:center;color:#4A5A66">Cargando el modelo…</div>
+<script type="text/babel" data-presets="react">
+const { useState, useMemo, useEffect } = React;
+
+/* ---------- almacenamiento tolerante a file:// ---------- */
+const mem = {};
+let storageOK = true;
+const store = {
+  get(k) { try { return localStorage.getItem(k); } catch (e) { storageOK = false; return mem[k] || null; } },
+  set(k, v) { try { localStorage.setItem(k, v); return true; } catch (e) { storageOK = false; mem[k] = v; return false; } },
+};
+
+/* ---------- evaluador de fórmulas ---------- */
+const PERMITIDO = /^[A-Za-z0-9_+\-*/().,%\s]*$/;
+function evalExpr(expr, scope) {
+  const e = String(expr == null || expr === "" ? "0" : expr);
+  if (!PERMITIDO.test(e)) throw new Error("La fórmula tiene caracteres no permitidos");
+  const keys = Object.keys(scope);
+  const sinNumeros = e.replace(/\b\d+(\.\d+)?([eE][+-]?\d+)?\b/g, " ");
+  const ids = sinNumeros.match(/[A-Za-z_][A-Za-z0-9_]*/g) || [];
+  for (let i = 0; i < ids.length; i++) {
+    if (keys.indexOf(ids[i]) < 0) throw new Error("Variable no definida: " + ids[i]);
+  }
+  const fn = new Function(...keys, '"use strict"; return (' + e + ");");
+  const r = fn(...keys.map((k) => scope[k]));
+  if (typeof r !== "number" || !isFinite(r)) throw new Error("El resultado no es un número");
+  return r;
+}
+
+const GRUPOS = [
+  { id: "medicion",  nombre: "Mediciones del proyecto",   color: "var(--azul)",  ayuda: "Superficies, longitudes y conteos que salen del plano." },
+  { id: "partida",   nombre: "Partidas de obra",          color: "var(--tinta)", ayuda: "Costo directo por partida. Es el punto de partida del modelo." },
+  { id: "parametro", nombre: "Parámetros y supuestos",    color: "var(--ambar)", ayuda: "Porcentajes, precios unitarios y supuestos que puedes mover." },
+  { id: "costo",     nombre: "Costos asociados",          color: "var(--rojo)",  ayuda: "Cargos que se suman al costo base: fijos, porcentuales o calculados." },
+  { id: "resultado", nombre: "Resultados e indicadores",  color: "var(--verde)", ayuda: "Lo que se calcula a partir de todo lo anterior." },
+];
+
+function v(key, nombre, grupo, tipo, extra) {
+  return { key, nombre, grupo, tipo, valor: 0, formula: "", baseKey: "", pct: "0",
+           unidad: "", nota: "", supuesto: false, destacado: false, ...extra };
+}
+
+const SEMILLA = [
+  v("S_TOTAL", "Superficie total del polígono", "medicion", "valor", { valor: 312684.55, unidad: "m²", nota: "Plano PMF4 01" }),
+  v("S_VENDIBLE", "Superficie vendible", "medicion", "valor", { valor: 253281.55, unidad: "m²", nota: "Frac. 4A + comercio + industrial" }),
+  v("N_LOTES", "Número de lotes", "medicion", "valor", { valor: 42, unidad: "lote", nota: "Memoria PM secc. 5.2" }),
+  v("L_VIALIDAD", "Longitud de vialidad", "medicion", "valor", { valor: 1348.41, unidad: "m", nota: "29,665 m² entre sección de 22.00 m" }),
+  v("S_ARROYO", "Superficie de arroyo a pavimentar", "medicion", "valor", { valor: 21574.55, unidad: "m²" }),
+  v("L_BARDA", "Longitud neta de barda perimetral", "medicion", "valor", { valor: 2420, unidad: "m", nota: "Perímetro menos accesos" }),
+  v("HECTAREAS", "Superficie en hectáreas", "medicion", "formula", { formula: "S_TOTAL / 10000", unidad: "ha" }),
+
+  v("P_TERRACERIAS", "I.1 Preliminares y terracerías", "partida", "valor", { valor: 12946590, unidad: "$" }),
+  v("P_AGUA_DRENAJE", "I.2 Agua potable y drenaje sanitario", "partida", "valor", { valor: 16305193, unidad: "$" }),
+  v("P_PAVIMENTOS", "I.3 Terracerías y pavimentos", "partida", "valor", { valor: 32909472, unidad: "$" }),
+  v("P_PLUVIAL", "I.4 Drenaje pluvial", "partida", "valor", { valor: 7473890, unidad: "$" }),
+  v("P_ELECTRICO", "I.5 Electrificación y alumbrado", "partida", "valor", { valor: 12500680, unidad: "$" }),
+  v("P_EQUIPAMIENTO", "I.6 Señalización, paisaje y equipamiento", "partida", "valor", { valor: 15765854, unidad: "$" }),
+  v("P_BARDA", "I.7 Barda perimetral sobre pilotes", "partida", "valor", { valor: 13644690, unidad: "$" }),
+  v("P_CASETAS", "I.8 Casetas de control de acceso", "partida", "valor", { valor: 8513500, unidad: "$" }),
+  v("COSTO_DIRECTO", "Costo directo de obra", "partida", "formula", {
+    formula: "P_TERRACERIAS + P_AGUA_DRENAJE + P_PAVIMENTOS + P_PLUVIAL + P_ELECTRICO + P_EQUIPAMIENTO + P_BARDA + P_CASETAS",
+    unidad: "$", nota: "Suma de las ocho partidas" }),
+
+  v("PCT_INDIRECTOS", "Indirectos de campo y oficina", "parametro", "valor", { valor: 12, unidad: "%" }),
+  v("PCT_FINANCIAMIENTO", "Financiamiento", "parametro", "valor", { valor: 2.5, unidad: "%" }),
+  v("PCT_UTILIDAD", "Utilidad del contratista", "parametro", "valor", { valor: 10, unidad: "%" }),
+  v("PCT_PROYECTOS", "Estudios y proyectos ejecutivos", "parametro", "valor", { valor: 3.5, unidad: "%" }),
+  v("PCT_LICENCIAS", "Licencias, permisos y factibilidades", "parametro", "valor", { valor: 3, unidad: "%" }),
+  v("PCT_SUPERVISION", "Supervisión y gerencia de proyecto", "parametro", "valor", { valor: 2.5, unidad: "%" }),
+  v("PCT_CONTINGENCIA", "Contingencia e imprevistos", "parametro", "valor", { valor: 8, unidad: "%" }),
+  v("PCT_IVA", "IVA", "parametro", "valor", { valor: 16, unidad: "%" }),
+  v("KVA_CONTRATADOS", "Capacidad eléctrica a contratar", "parametro", "valor", { valor: 2500, unidad: "kVA", supuesto: true, nota: "≈ 80 kVA por hectárea de red interna" }),
+  v("COSTO_KVA", "Aportación CFE por kVA", "parametro", "valor", { valor: 4200, unidad: "$/kVA", supuesto: true, nota: "Confirmar con CFE División Golfo Norte" }),
+  v("PRECIO_VENTA_M2", "Precio de venta del m² vendible", "parametro", "valor", { valor: 3000, unidad: "$/m²", supuesto: true, nota: "Placeholder: definir con estudio comercial" }),
+  v("COSTO_TERRENO", "Costo del terreno", "parametro", "valor", { valor: 0, unidad: "$", supuesto: true, nota: "Capturar si el terreno se adquiere" }),
+
+  v("INDIRECTOS", "Indirectos", "costo", "porcentaje", { baseKey: "COSTO_DIRECTO", pct: "PCT_INDIRECTOS", unidad: "$" }),
+  v("FINANCIAMIENTO", "Financiamiento", "costo", "porcentaje", { baseKey: "COSTO_DIRECTO", pct: "PCT_FINANCIAMIENTO", unidad: "$" }),
+  v("UTILIDAD", "Utilidad del contratista", "costo", "porcentaje", { baseKey: "COSTO_DIRECTO", pct: "PCT_UTILIDAD", unidad: "$" }),
+  v("PROYECTOS", "Estudios y proyectos ejecutivos", "costo", "porcentaje", { baseKey: "COSTO_DIRECTO", pct: "PCT_PROYECTOS", unidad: "$" }),
+  v("LICENCIAS", "Licencias y permisos", "costo", "porcentaje", { baseKey: "COSTO_DIRECTO", pct: "PCT_LICENCIAS", unidad: "$" }),
+  v("SUPERVISION", "Supervisión y gerencia", "costo", "porcentaje", { baseKey: "COSTO_DIRECTO", pct: "PCT_SUPERVISION", unidad: "$" }),
+  v("CONTINGENCIA", "Contingencia", "costo", "porcentaje", { baseKey: "COSTO_DIRECTO", pct: "PCT_CONTINGENCIA", unidad: "$" }),
+  v("APORTACION_CFE", "Aportación a CFE por capacidad", "costo", "formula", {
+    formula: "KVA_CONTRATADOS * COSTO_KVA", unidad: "$", supuesto: true,
+    nota: "Cargo fuera del contrato de obra, por capacidad contratada" }),
+
+  v("OBRA_CONTRATADA", "Precio de obra contratada", "resultado", "formula", {
+    formula: "COSTO_DIRECTO + INDIRECTOS + FINANCIAMIENTO + UTILIDAD", unidad: "$" }),
+  v("INVERSION_SIN_IVA", "Inversión total antes de IVA", "resultado", "formula", {
+    formula: "OBRA_CONTRATADA + PROYECTOS + LICENCIAS + SUPERVISION + CONTINGENCIA + APORTACION_...</script></body></html>
