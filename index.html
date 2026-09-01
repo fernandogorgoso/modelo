@@ -2,105 +2,171 @@
 <html lang="es">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Fracción 4 · Altamira Logistics — Modelo de variables</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Modelo de variables</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
-<script src="https://unpkg.com/htm@3.1.1/dist/htm.umd.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
 <style>
 :root{--papel:#EDEFF0;--panel:#fff;--tinta:#14212B;--tinta2:#4A5A66;--regla:#CBD2D6;--regla2:#9AA6AE;
---azul:#22536E;--azulS:#E4EBEF;--verde:#0E6E5E;--verdeS:#E0EFEB;--ambar:#9A6414;--ambarS:#F5EBDA;--rojo:#8C2F2A;--rojoS:#F6E7E6;}
-*{box-sizing:border-box}
-body{margin:0;background:var(--papel);color:var(--tinta);
- font-family:ui-sans-serif,system-ui,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;font-size:14px;line-height:1.45}
-.wrap{max-width:1240px;margin:0 auto;padding:22px 20px 60px}
+--azul:#22536E;--azulS:#E4EBEF;--verde:#0E6E5E;--verdeS:#E0EFEB;--ambar:#9A6414;--ambarS:#F5EBDA;
+--rojo:#8C2F2A;--rojoS:#F6E7E6;--sombra:0 8px 32px rgba(20,33,43,.22);}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:var(--papel);color:var(--tinta);font-size:15px;line-height:1.45;
+ font-family:ui-sans-serif,system-ui,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;-webkit-text-size-adjust:100%}
+.wrap{max-width:1180px;margin:0 auto;padding:18px 16px 80px}
 .num{font-variant-numeric:tabular-nums}
-h1{font-size:23px;margin:0;letter-spacing:-.01em;font-weight:600}
+h1{font-size:21px;margin:0;letter-spacing:-.01em;font-weight:600}
 h2{font-size:16px;margin:0;font-weight:600}
 h3{font-size:14px;margin:0 0 8px;font-weight:600}
-.sub{color:var(--tinta2);font-size:13px;margin:4px 0 0}
+.sub{color:var(--tinta2);font-size:13px;margin:3px 0 0}
 .mini{color:var(--tinta2);font-size:12px}
-header.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:18px;
- padding-bottom:14px;border-bottom:2px solid var(--tinta)}
-.cifra{text-align:right}
-.cifra .v{font-size:20px;font-weight:600}
-nav{display:flex;flex-wrap:wrap;gap:4px;margin:16px 0 18px}
-.tab{padding:8px 16px;font-size:14px;font-weight:500;background:none;border:1px solid var(--regla);
- color:var(--tinta2);cursor:pointer;font-family:inherit}
+header.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:14px;
+ padding-bottom:12px;border-bottom:2px solid var(--tinta)}
+.tit{background:none;border:none;padding:0;font:inherit;color:inherit;text-align:left;cursor:text}
+.tit:hover{background:var(--azulS)}
+.cifras{display:flex;gap:22px;overflow-x:auto;padding-bottom:2px}
+.cifra{flex:none;text-align:right}
+.cifra .v{font-size:19px;font-weight:600;white-space:nowrap}
+.acciones{display:flex;align-items:center;justify-content:flex-end;gap:6px;margin:14px 0 10px;flex-wrap:wrap}
+.acciones .sep{flex:1}
+.tabs{display:flex;gap:4px;overflow-x:auto;margin-bottom:18px;padding-bottom:3px;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex:none;padding:9px 15px;font-size:14px;font-weight:500;background:none;border:1px solid var(--regla);
+ color:var(--tinta2);cursor:pointer;font-family:inherit;white-space:nowrap}
 .tab.on{background:var(--tinta);color:var(--papel);border-color:var(--tinta)}
-.btn{padding:7px 13px;font-size:13px;background:none;border:1px solid var(--regla);color:var(--tinta2);
+.ico{flex:none;display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;
+ background:none;border:1px solid var(--regla);color:var(--tinta2);cursor:pointer;padding:0}
+.ico:hover{background:#fff;color:var(--tinta)}
+.ico.p{background:var(--tinta);color:var(--papel);border-color:var(--tinta)}
+.btn{padding:8px 14px;font-size:14px;background:none;border:1px solid var(--regla);color:var(--tinta2);
  cursor:pointer;font-family:inherit}
 .btn:hover{background:#fff}
 .btn.p{background:var(--tinta);color:var(--papel);border-color:var(--tinta)}
-.btn.mini{padding:3px 8px;font-size:12px}
-.grow{flex:1}
+.btn.mini{padding:4px 9px;font-size:12px}
 .card{background:var(--panel);border:1px solid var(--regla)}
 .pad{padding:16px}
-.cols{display:grid;grid-template-columns:minmax(0,1fr) 344px;gap:20px}
-@media(max-width:980px){.cols{grid-template-columns:1fr}}
-.grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(215px,1fr))}
-.vrow{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:7px 12px;
- background:none;border:none;border-top:1px solid var(--regla);cursor:pointer;font-family:inherit;font-size:14px}
+.grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(210px,1fr))}
+.cols{display:grid;grid-template-columns:minmax(0,1fr) 350px;gap:20px;align-items:start}
+.aside{position:sticky;top:16px;max-height:calc(100vh - 34px);overflow:auto}
+.aside .vacio{padding:26px 16px;text-align:center}
+.vrow{display:flex;align-items:center;gap:10px;width:100%;text-align:left;padding:10px 6px 10px 12px;
+ background:none;border:none;border-top:1px solid var(--regla);font-family:inherit;font-size:15px}
 .vrow:first-child{border-top:none}
 .vrow.on{background:var(--azulS)}
-.vrow .k{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:12px;width:158px;flex:none;
+.vcuerpo{flex:1;min-width:0;display:flex;align-items:center;gap:10px;background:none;border:none;
+ padding:0;font:inherit;color:inherit;text-align:left;cursor:pointer}
+.vrow .k{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:12px;width:152px;flex:none;
  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.vrow .n{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.vrow .v{width:132px;flex:none;text-align:right;font-weight:500}
-.tag{font-size:11px;padding:1px 6px;flex:none}
+.vrow .n{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.vrow .v{width:126px;flex:none;text-align:right;font-weight:500}
+.tag{font-size:11px;padding:1px 6px;flex:none;white-space:nowrap}
 .tag.sup{background:var(--ambarS);color:var(--ambar)}
-label.f{display:block;margin-bottom:10px}
-label.f>span{display:block;font-size:12px;color:var(--tinta2);margin-bottom:3px}
-input,select,textarea{width:100%;padding:5px 7px;font-size:13px;font-family:inherit;
- border:1px solid var(--regla);background:#fff;color:var(--tinta)}
-input.mono,textarea.mono,select.mono{font-family:ui-monospace,SFMono-Regular,Consolas,monospace}
-.seg{display:flex;gap:3px}
-.seg button{flex:1;padding:5px;font-size:12px;background:none;border:1px solid var(--regla);
+label.f{display:block;margin-bottom:12px}
+label.f>span{display:block;font-size:12px;color:var(--tinta2);margin-bottom:4px}
+input,select,textarea{width:100%;padding:9px 10px;font-size:16px;font-family:inherit;
+ border:1px solid var(--regla);background:#fff;color:var(--tinta);border-radius:0}
+.mono{font-family:ui-monospace,SFMono-Regular,Consolas,monospace}
+.seg{display:flex;gap:4px}
+.seg button{flex:1;padding:9px 4px;font-size:13px;background:none;border:1px solid var(--regla);
  color:var(--tinta2);cursor:pointer;font-family:inherit}
 .seg button.on{background:var(--tinta);color:var(--papel);border-color:var(--tinta)}
-.chip{font-family:ui-monospace,Consolas,monospace;font-size:11px;padding:2px 6px;background:var(--azulS);
- color:var(--azul);border:none;cursor:pointer;margin:0 3px 3px 0}
-table{width:100%;border-collapse:collapse;font-size:14px}
-th{text-align:left;padding:7px 12px;font-weight:600;border-bottom:1px solid var(--regla2)}
-td{padding:6px 12px;border-top:1px solid var(--regla)}
+.chip{font-family:ui-monospace,Consolas,monospace;font-size:12px;padding:4px 8px;background:var(--azulS);
+ color:var(--azul);border:none;cursor:pointer;margin:0 4px 4px 0}
+.tblwrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:14px;min-width:460px}
+th{text-align:left;padding:8px 12px;font-weight:600;border-bottom:1px solid var(--regla2);white-space:nowrap}
+td{padding:8px 12px;border-top:1px solid var(--regla)}
 td.r,th.r{text-align:right}
 tr.fuerte{background:var(--azulS)}
 tr.fuerte td{font-weight:600}
-.bars{display:flex;flex-direction:column;gap:7px}
+.bars{display:flex;flex-direction:column;gap:8px}
 .bar{display:flex;align-items:center;gap:10px}
-.bar .lbl{width:250px;flex:none;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.bar .track{flex:1;height:20px;background:#F2F4F5}
+.bar .lbl{width:230px;flex:none;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bar .track{flex:1;height:20px;background:#F2F4F5;min-width:40px}
 .bar .fill{height:100%;background:var(--azul)}
-.bar .val{width:96px;flex:none;text-align:right;font-size:13px}
+.bar .val{width:88px;flex:none;text-align:right;font-size:13px}
 .torn{display:flex;align-items:center;gap:8px}
-.torn .lbl{width:250px;flex:none;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.torn .half{flex:1;height:20px;display:flex}
+.torn .lbl{width:210px;flex:none;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.torn .half{flex:1;height:20px;display:flex;min-width:30px}
 .torn .L{justify-content:flex-end;border-right:2px solid var(--tinta)}
-.torn .seg2{height:100%}
-.vbars{display:flex;align-items:flex-end;gap:18px;height:200px;padding-top:20px}
-.vbar{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%}
+.vbars{display:flex;align-items:flex-end;gap:14px;height:190px;padding-top:20px;overflow-x:auto}
+.vbar{flex:1;min-width:56px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%}
 .vbar .b{width:100%;background:var(--azul)}
-.vbar .cap{font-size:12px;margin-top:6px;text-align:center}
-.aviso{padding:9px 14px;margin-bottom:14px;font-size:13px}
+.vbar .cap{font-size:12px;margin-top:6px;text-align:center;word-break:break-word}
+.aviso{padding:10px 14px;margin-bottom:14px;font-size:13px}
 .aviso.ok{background:var(--verdeS);color:var(--verde)}
 .aviso.err{background:var(--rojoS);color:var(--rojo)}
-.sticky{position:sticky;top:16px;align-self:start}
-.lista li{display:flex;gap:14px;padding:5px 0;border-bottom:1px solid var(--regla);list-style:none}
+.lista li{display:flex;gap:14px;padding:6px 0;border-bottom:1px solid var(--regla);list-style:none}
 .lista{margin:0;padding:0}
 .kpi{border-top:2px solid var(--tinta);padding:10px 0}
-.kpi .v{font-size:24px;font-weight:600}
-.scroll{max-height:180px;overflow:auto;border:1px solid var(--regla)}
-.scroll button{display:block;width:100%;text-align:left;padding:3px 7px;font-size:12px;background:none;
- border:none;cursor:pointer;font-family:ui-monospace,Consolas,monospace}
+.kpi .v{font-size:23px;font-weight:600}
+.scroll{max-height:190px;overflow:auto;border:1px solid var(--regla)}
+.scroll button{display:block;width:100%;text-align:left;padding:7px 9px;font-size:13px;background:none;
+ border:none;border-top:1px solid var(--regla);cursor:pointer;font-family:ui-monospace,Consolas,monospace}
+.scroll button:first-child{border-top:none}
 .scroll button:hover{background:#F2F4F5}
-@media print{nav,.btn,.noprint{display:none!important}body{background:#fff}.card{border:none}}
+/* --- capa modal --- */
+.velo{position:fixed;inset:0;background:rgba(20,33,43,.45);z-index:50;display:flex;
+ align-items:center;justify-content:center;padding:20px}
+.modal{background:var(--panel);border:1px solid var(--regla2);box-shadow:var(--sombra);
+ width:100%;max-width:460px;max-height:100%;overflow:auto}
+.modal .mhead{position:sticky;top:0;background:var(--panel);display:flex;align-items:center;
+ justify-content:space-between;gap:10px;padding:14px 16px;border-bottom:1px solid var(--regla);z-index:1}
+.modal .mbody{padding:16px}
+.modal .mfoot{position:sticky;bottom:0;background:var(--panel);display:flex;gap:8px;justify-content:flex-end;
+ padding:12px 16px;border-top:1px solid var(--regla)}
+.menu{position:fixed;z-index:60;background:var(--panel);border:1px solid var(--regla2);
+ box-shadow:var(--sombra);min-width:200px;padding:4px 0}
+.menu button{display:flex;align-items:center;gap:10px;width:100%;text-align:left;padding:10px 14px;
+ background:none;border:none;font:inherit;font-size:14px;color:var(--tinta);cursor:pointer}
+.menu button:hover{background:var(--azulS)}
+.menu button.rojo{color:var(--rojo)}
+.menu hr{border:none;border-top:1px solid var(--regla);margin:4px 0}
+/* --- móvil --- */
+@media(max-width:980px){.cols{grid-template-columns:1fr}.aside{display:none}}
+@media(max-width:720px){
+  .wrap{padding:14px 12px 90px}
+  h1{font-size:19px}
+  .cifra .v{font-size:17px}
+  .cifras{gap:16px;width:100%}
+  .acciones{justify-content:space-between;gap:4px}
+  .acciones .ico{flex:1;max-width:none}
+  .acciones .sep{display:none}
+  .vrow .k{display:none}
+  .vrow{padding:11px 4px 11px 12px}
+  .vrow .v{width:auto;min-width:96px}
+  .bar .lbl,.torn .lbl{width:130px;font-size:12px}
+  .bar .val{width:66px;font-size:12px}
+  .velo{padding:0;align-items:flex-end}
+  .modal{max-width:none;max-height:92vh;border:none;border-top:3px solid var(--tinta)}
+  .menu{left:0!important;right:0;bottom:0;top:auto!important;min-width:0;padding:6px 0 14px;
+   border-left:none;border-right:none;border-bottom:none;border-top:3px solid var(--tinta)}
+  .menu button{padding:14px 18px;font-size:15px}
+}
+@media print{
+  @page{size:A4 portrait;margin:13mm}
+  html,body{background:#fff!important;font-size:10.5pt;
+    -webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .acciones,.ico,.btn,.noprint,.aside,.velo,.menu,.tabs{display:none!important}
+  .wrap{max-width:none;padding:0}
+  .card{border:none!important;box-shadow:none}
+  .tit{background:none!important}
+  input,textarea,select{border:none!important;padding:0!important;background:none!important;font-size:inherit}
+  header.top{border-bottom:1.5pt solid var(--tinta);padding-bottom:8px}
+  section,.kpi,.bar,.torn,.lista li,tr{break-inside:avoid;page-break-inside:avoid}
+  h2,h3{break-after:avoid;page-break-after:avoid}
+  table{min-width:0}
+  .tblwrap{overflow:visible}
+  .bar .lbl,.torn .lbl{width:210px}
+  .bar .track,.bar .fill,.vbar .b,.torn div,tr.fuerte,.tag{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
 </style>
 </head>
 <body>
 <div id="raiz" style="padding:48px;text-align:center;color:#4A5A66">Cargando el modelo…</div>
-<script>
-const { useState, useMemo, useEffect, createElement } = React;
-const html = htm.bind(createElement);
+<script type="text/babel" data-presets="react">
+const { useState, useMemo, useEffect, useRef } = React;
 
 /* ---------- almacenamiento tolerante a file:// ---------- */
 const mem = {};
@@ -146,17 +212,19 @@ const SEMILLA = [
   v("N_LOTES", "Número de lotes", "medicion", "valor", { valor: 42, unidad: "lote", nota: "Memoria PM secc. 5.2" }),
   v("L_VIALIDAD", "Longitud de vialidad", "medicion", "valor", { valor: 1348.41, unidad: "m", nota: "29,665 m² entre sección de 22.00 m" }),
   v("S_ARROYO", "Superficie de arroyo a pavimentar", "medicion", "valor", { valor: 21574.55, unidad: "m²" }),
+  v("L_BARDA", "Longitud neta de barda perimetral", "medicion", "valor", { valor: 2420, unidad: "m", nota: "Perímetro menos accesos" }),
   v("HECTAREAS", "Superficie en hectáreas", "medicion", "formula", { formula: "S_TOTAL / 10000", unidad: "ha" }),
 
-  v("P_TERRACERIAS", "I.1 Preliminares y terracerías", "partida", "valor", { valor: 4771037, unidad: "$" }),
-  v("P_AGUA_DRENAJE", "I.2 Agua potable y drenaje sanitario", "partida", "valor", { valor: 13644200, unidad: "$" }),
-  v("P_PAVIMENTOS", "I.3 Terracerías y pavimentos", "partida", "valor", { valor: 26426178, unidad: "$" }),
-  v("P_PLUVIAL", "I.4 Drenaje pluvial", "partida", "valor", { valor: 6764555.8, unidad: "$" }),
+  v("P_TERRACERIAS", "I.1 Preliminares y terracerías", "partida", "valor", { valor: 12946590, unidad: "$" }),
+  v("P_AGUA_DRENAJE", "I.2 Agua potable y drenaje sanitario", "partida", "valor", { valor: 16305193, unidad: "$" }),
+  v("P_PAVIMENTOS", "I.3 Terracerías y pavimentos", "partida", "valor", { valor: 32909472, unidad: "$" }),
+  v("P_PLUVIAL", "I.4 Drenaje pluvial", "partida", "valor", { valor: 7473890, unidad: "$" }),
   v("P_ELECTRICO", "I.5 Electrificación y alumbrado", "partida", "valor", { valor: 12500680, unidad: "$" }),
-  v("P_EQUIPAMIENTO", "I.6 Señalización, paisaje y equipamiento", "partida", "valor", { valor: 18228355, unidad: "$" }),
+  v("P_EQUIPAMIENTO", "I.6 Señalización, paisaje y equipamiento", "partida", "valor", { valor: 15765854, unidad: "$" }),
+  v("P_BARDA", "I.7 Barda perimetral sobre pilotes", "partida", "valor", { valor: 13644690, unidad: "$" }),
   v("P_CASETAS", "I.8 Casetas de control de acceso", "partida", "valor", { valor: 8513500, unidad: "$" }),
   v("COSTO_DIRECTO", "Costo directo de obra", "partida", "formula", {
-    formula: "P_TERRACERIAS + P_AGUA_DRENAJE + P_PAVIMENTOS + P_PLUVIAL + P_ELECTRICO + P_EQUIPAMIENTO +  P_CASETAS",
+    formula: "P_TERRACERIAS + P_AGUA_DRENAJE + P_PAVIMENTOS + P_PLUVIAL + P_ELECTRICO + P_EQUIPAMIENTO + P_BARDA + P_CASETAS",
     unidad: "$", nota: "Suma de las ocho partidas" }),
 
   v("PCT_INDIRECTOS", "Indirectos de campo y oficina", "parametro", "valor", { valor: 12, unidad: "%" }),
@@ -195,6 +263,7 @@ const SEMILLA = [
   v("COSTO_POR_LOTE", "Costo por lote", "resultado", "formula", { formula: "INVERSION_SIN_IVA / N_LOTES", unidad: "$/lote" }),
   v("COSTO_POR_HA", "Costo por hectárea bruta", "resultado", "formula", { formula: "INVERSION_SIN_IVA / HECTAREAS", unidad: "$/ha" }),
   v("COSTO_ML_VIALIDAD", "Costo por metro de vialidad", "resultado", "formula", { formula: "INVERSION_SIN_IVA / L_VIALIDAD", unidad: "$/m" }),
+  v("COSTO_ML_BARDA", "Costo directo por metro de barda", "resultado", "formula", { formula: "P_BARDA / L_BARDA", unidad: "$/m" }),
   v("INGRESO_ESTIMADO", "Ingreso estimado por venta", "resultado", "formula", { formula: "S_VENDIBLE * PRECIO_VENTA_M2", unidad: "$", supuesto: true }),
   v("UTILIDAD_PROYECTO", "Utilidad bruta del desarrollo", "resultado", "formula", { formula: "INGRESO_ESTIMADO - INVERSION_SIN_IVA", unidad: "$", destacado: true }),
   v("MARGEN", "Margen bruto sobre ingreso", "resultado", "formula", { formula: "UTILIDAD_PROYECTO / INGRESO_ESTIMADO * 100", unidad: "%", destacado: true }),
@@ -257,76 +326,163 @@ function corto(val) {
   return val.toFixed(0);
 }
 
+/* ---------- iconos ---------- */
+const S = (p) => React.createElement("svg", { viewBox: "0 0 24 24", width: p.s || 19, height: p.s || 19,
+  fill: "none", stroke: "currentColor", strokeWidth: 1.7, strokeLinecap: "round", strokeLinejoin: "round" }, p.children);
+const IcoGuardar = (p) => <S {...p}><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></S>;
+const IcoBajar   = (p) => <S {...p}><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></S>;
+const IcoSubir   = (p) => <S {...p}><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></S>;
+const IcoAjustes = (p) => <S {...p}><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></S>;
+const IcoMas     = (p) => <S {...p}><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></S>;
+const IcoPuntos  = (p) => <S {...p}><circle cx="12" cy="5" r="1.4"/><circle cx="12" cy="12" r="1.4"/><circle cx="12" cy="19" r="1.4"/></S>;
+const IcoCerrar  = (p) => <S {...p}><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></S>;
+const IcoEditar  = (p) => <S {...p}><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.1 2.1 0 0 1 3 3L12 15l-4 1 1-4z"/></S>;
+const IcoCopiar  = (p) => <S {...p}><rect x="9" y="9" width="13" height="13" rx="1"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></S>;
+const IcoBorrar  = (p) => <S {...p}><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></S>;
+const IcoEstrella= (p) => <S {...p}><polygon points="12 2 15.1 8.3 22 9.3 17 14.1 18.2 21 12 17.8 5.8 21 7 14.1 2 9.3 8.9 8.3 12 2"/></S>;
+const IcoAlerta  = (p) => <S {...p}><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></S>;
+const IcoCamara  = (p) => <S {...p}><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></S>;
+const IcoPDF     = (p) => <S {...p}><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></S>;
+
 /* ---------- piezas ---------- */
 function Campo({ etiqueta, children }) {
-  return html`<label className="f"><span>${etiqueta}</span>${children}</label>`;
-}
-function Chips({ titulo, items, onIr, porKey, scope }) {
-  if (!items.length) return null;
-  return html`
-    <div style=${{ marginBottom: 10 }}>
-      <div className="mini" style=${{ marginBottom: 3 }}>${titulo}</div>
-      <div>${items.map((k) => html`
-        <button key=${k} className="chip" onClick=${() => onIr(k)}
-          title=${(porKey[k] ? porKey[k].nombre : k) + ": " + fmt(scope[k], porKey[k] && porKey[k].unidad)}>${k}</button>
-      `)}</div>
-    </div>
-  `;
-}
-function Barras({ datos }) {
-  const max = Math.max(...datos.map((d) => Math.abs(d.valor)), 1);
-  return html`
-    <div className="bars">
-      ${datos.map((d) => html`
-        <div className="bar" key=${d.key || d.nombre}>
-          <div className="lbl" title=${d.nombre}>${d.nombre}</div>
-          <div className="track"><div className="fill" style=${{ width: (Math.abs(d.valor) / max) * 100 + "%" }} /></div>
-          <div className="val num">${corto(d.valor)}</div>
-        </div>
-      `)}
-    </div>
-  `;
-}
-function Tornado({ datos }) {
-  const max = Math.max(...datos.map((d) => Math.max(Math.abs(d.baja), Math.abs(d.sube))), 1);
-  return html`
-    <div className="bars">
-      ${datos.map((d) => html`
-        <div className="torn" key=${d.key}>
-          <div className="lbl" title=${d.nombre}>${d.nombre}</div>
-          <div className="half L">
-            <div className="seg2" style=${{ width: (Math.abs(Math.min(d.baja, 0)) / max) * 100 + "%", background: "var(--verde)" }} />
-          </div>
-          <div className="half">
-            <div className="seg2" style=${{ width: (Math.abs(Math.max(d.sube, 0)) / max) * 100 + "%", background: "var(--ambar)" }} />
-          </div>
-          <div className="val num" style=${{ width: 96, textAlign: "right", fontSize: 13 }}>±${corto(d.amplitud / 2)}</div>
-        </div>
-      `)}
-    </div>
-  `;
-}
-function Tabla({ filas, total }) {
-  return html`
-    <table><tbody>
-      ${filas.map((f, i) => html`
-        <tr key=${i} className=${f[2] ? "fuerte" : ""}>
-          <td>${f[0]}</td>
-          <td className="r mini num" style=${{ width: 78 }}>
-            ${total && isFinite(f[1]) ? ((f[1] / total) * 100).toFixed(1) + "%" : ""}
-          </td>
-          <td className="r num" style=${{ width: 148 }}>${fmt(f[1], "$")}</td>
-        </tr>
-      `)}
-    </tbody></table>
-  `;
+  return <label className="f"><span>{etiqueta}</span>{children}</label>;
 }
 
+function Modal({ titulo, onCerrar, children, pie }) {
+  useEffect(() => {
+    const esc = (e) => { if (e.key === "Escape") onCerrar(); };
+    window.addEventListener("keydown", esc);
+    return () => window.removeEventListener("keydown", esc);
+  }, [onCerrar]);
+  return (
+    <div className="velo" onMouseDown={(e) => { if (e.target === e.currentTarget) onCerrar(); }}>
+      <div className="modal" onMouseDown={(e) => e.stopPropagation()}>
+        <div className="mhead">
+          <h3 style={{ margin: 0 }}>{titulo}</h3>
+          <button className="ico" style={{ width: 34, height: 34 }} onClick={onCerrar} aria-label="Cerrar"><IcoCerrar s={17} /></button>
+        </div>
+        <div className="mbody">{children}</div>
+        {pie && <div className="mfoot">{pie}</div>}
+      </div>
+    </div>
+  );
+}
+
+function MenuCtx({ pos, items, onCerrar }) {
+  const movil = typeof window !== "undefined" && window.innerWidth <= 720;
+  const estilo = movil ? {} : {
+    top: Math.min(pos.y, window.innerHeight - items.length * 42 - 20),
+    left: Math.min(pos.x, window.innerWidth - 220),
+  };
+  return (
+    <div style={{ position: "fixed", inset: 0, zIndex: 59 }} onMouseDown={onCerrar}>
+      <div className="menu" style={estilo} onMouseDown={(e) => e.stopPropagation()}>
+        {items.map((it, i) => it.sep
+          ? <hr key={i} />
+          : <button key={i} className={it.rojo ? "rojo" : ""} onClick={() => { it.accion(); onCerrar(); }}>
+              {it.icono}<span>{it.texto}</span>
+            </button>)}
+      </div>
+    </div>
+  );
+}
+
+function Barras({ datos }) {
+  const max = Math.max(...datos.map((d) => Math.abs(d.valor)), 1);
+  return <div className="bars">{datos.map((d) => (
+    <div className="bar" key={d.key || d.nombre}>
+      <div className="lbl" title={d.nombre}>{d.nombre}</div>
+      <div className="track"><div className="fill" style={{ width: (Math.abs(d.valor) / max) * 100 + "%" }} /></div>
+      <div className="val num">{corto(d.valor)}</div>
+    </div>))}</div>;
+}
+
+function Tornado({ datos }) {
+  const max = Math.max(...datos.map((d) => Math.max(Math.abs(d.baja), Math.abs(d.sube))), 1);
+  return <div className="bars">{datos.map((d) => (
+    <div className="torn" key={d.key}>
+      <div className="lbl" title={d.nombre}>{d.nombre}</div>
+      <div className="half L"><div style={{ height: "100%", width: (Math.abs(Math.min(d.baja, 0)) / max) * 100 + "%", background: "var(--verde)" }} /></div>
+      <div className="half"><div style={{ height: "100%", width: (Math.abs(Math.max(d.sube, 0)) / max) * 100 + "%", background: "var(--ambar)" }} /></div>
+      <div className="num" style={{ width: 76, flex: "none", textAlign: "right", fontSize: 12 }}>±{corto(d.amplitud / 2)}</div>
+    </div>))}</div>;
+}
+
+function Tabla({ filas, total }) {
+  return <div className="tblwrap"><table><tbody>
+    {filas.map((f, i) => (
+      <tr key={i} className={f[2] ? "fuerte" : ""}>
+        <td>{f[0]}</td>
+        <td className="r mini num" style={{ width: 70 }}>{total && isFinite(f[1]) ? ((f[1] / total) * 100).toFixed(1) + "%" : ""}</td>
+        <td className="r num" style={{ width: 140 }}>{fmt(f[1], "$")}</td>
+      </tr>))}
+  </tbody></table></div>;
+}
+
+/* ---------- guardar como HTML nuevo ---------- */
+function descargar(texto, nombre, tipo) {
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([texto], { type: tipo }));
+  a.download = nombre;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+}
+
+function guardarHTML(datos, nombreArchivo) {
+  const doc = document.documentElement.cloneNode(true);
+  const raiz = doc.querySelector("#raiz");
+  if (raiz) { raiz.innerHTML = ""; raiz.setAttribute("style", "padding:48px;text-align:center;color:#4A5A66"); raiz.textContent = "Cargando el modelo…"; }
+  let bloque = doc.querySelector("#datos");
+  if (!bloque) {
+    bloque = document.createElement("script");
+    bloque.id = "datos"; bloque.type = "application/json";
+    doc.querySelector("body").insertBefore(bloque, doc.querySelector("#raiz"));
+  }
+  bloque.textContent = JSON.stringify(datos).replace(/</g, "\\u003c");
+  descargar("<!DOCTYPE html>\n" + doc.outerHTML, nombreArchivo, "text/html;charset=utf-8");
+}
+
+function leerEmbebido() {
+  try {
+    const el = document.getElementById("datos");
+    if (el && el.textContent.trim()) return JSON.parse(el.textContent);
+  } catch (e) {}
+  return null;
+}
+
+function useMedia(q) {
+  const leer = () => (typeof window !== "undefined" && window.matchMedia) ? window.matchMedia(q).matches : false;
+  const [m, setM] = useState(leer);
+  useEffect(() => {
+    if (typeof window === "undefined" || !window.matchMedia) return;
+    const mm = window.matchMedia(q), h = (e) => setM(e.matches);
+    setM(mm.matches);
+    if (mm.addEventListener) { mm.addEventListener("change", h); return () => mm.removeEventListener("change", h); }
+    mm.addListener(h); return () => mm.removeListener(h);
+  }, [q]);
+  return m;
+}
+
+const TITULOS_DEF = {
+  proyecto: "Fracción 4 · Altamira Logistics",
+  subtitulo: "Modelo de variables para decisiones de inversión · NUEVALTA, Altamira, Tamaulipas",
+  reporte: "Resumen de inversión",
+  pie: "Estimado paramétrico clase 4-5 (AACE) sobre plan maestro; rango esperado de −20% a +30%. Precios base de las cotizaciones DLG y ELYEIVER del Fracc. Amaranta, actualizados a agosto de 2026 con el INPP-Construcción del INEGI.",
+  archivo: "modelo-fraccion-4",
+};
+
 function App() {
-  const [vars, setVars] = useState(SEMILLA);
+  const inicial = leerEmbebido();
+  const [vars, setVars] = useState(() => (inicial && inicial.vars && inicial.vars.length) ? inicial.vars : SEMILLA);
+  const [escenarios, setEscenarios] = useState(() => (inicial && inicial.escenarios) || []);
+  const [titulos, setTitulos] = useState(() => ({ ...TITULOS_DEF, ...((inicial && inicial.titulos) || {}) }));
   const [vista, setVista] = useState("variables");
+  const esMovil = useMedia("(max-width: 980px)");
   const [sel, setSel] = useState("INVERSION_SIN_IVA");
-  const [escenarios, setEscenarios] = useState([]);
+  const [modal, setModal] = useState(false);
+  const [menu, setMenu] = useState(null);           // {key,x,y}
+  const [ajustes, setAjustes] = useState(false);
   const [objetivo, setObjetivo] = useState("INVERSION_SIN_IVA");
   const [rango, setRango] = useState(20);
   const [aviso, setAviso] = useState(null);
@@ -335,31 +491,38 @@ function App() {
   const { scope, estado } = useMemo(() => calcular(vars), [vars]);
   const porKey = useMemo(() => Object.fromEntries(vars.map((x) => [x.key, x])), [vars]);
 
+  useEffect(() => { document.title = titulos.proyecto; }, [titulos.proyecto]);
+  useEffect(() => { store.set("modelo-f4", JSON.stringify({ vars, escenarios, titulos })); }, [vars, escenarios, titulos]);
   useEffect(() => {
+    if (inicial) return;
     const raw = store.get("modelo-f4");
-    if (raw) { try { const d = JSON.parse(raw); if (d.vars && d.vars.length) setVars(d.vars); if (d.escenarios) setEscenarios(d.escenarios); } catch (e) {} }
+    if (raw) { try { const d = JSON.parse(raw);
+      if (d.vars && d.vars.length) setVars(d.vars);
+      if (d.escenarios) setEscenarios(d.escenarios);
+      if (d.titulos) setTitulos((t) => ({ ...t, ...d.titulos })); } catch (e) {} }
   }, []);
 
-  const notificar = (t, err) => { setAviso({ t, err }); setTimeout(() => setAviso(null), 3200); };
-  const guardar = () => {
-    const ok = store.set("modelo-f4", JSON.stringify({ vars, escenarios }));
-    ok ? notificar("Modelo guardado en este navegador")
-       : notificar("Tu navegador bloquea el guardado al abrir el archivo directamente. Usa Exportar para conservar el modelo.", true);
-  };
+  const notificar = (t, err) => { setAviso({ t, err }); setTimeout(() => setAviso(null), 3400); };
   const editar = (key, campo, valor) => setVars((p) => p.map((x) => (x.key === key ? { ...x, [campo]: valor } : x)));
-
-  const agregar = (grupo) => {
-    let n = 1; while (claves.indexOf("NUEVA_" + n) >= 0) n++;
-    const nv = v("NUEVA_" + n, "Variable sin nombre", grupo, grupo === "costo" ? "porcentaje" : "valor",
-      { unidad: grupo === "medicion" ? "m²" : grupo === "parametro" ? "%" : "$", baseKey: "COSTO_DIRECTO", pct: "0" });
-    setVars((p) => [...p, nv]); setSel(nv.key); setVista("variables");
-  };
   const usos = (key) => vars.filter((x) => x.key !== key && deps(x, claves).indexOf(key) >= 0);
+
+  const abrirEdicion = (key) => { setSel(key); if (esMovil) setModal(true); };
+  const nuevaClave = (base) => { let n = 1; while (claves.indexOf(base + "_" + n) >= 0) n++; return base + "_" + n; };
+  const agregar = (grupo) => {
+    const nv = v(nuevaClave("NUEVA"), "Variable sin nombre", grupo, grupo === "costo" ? "porcentaje" : "valor",
+      { unidad: grupo === "medicion" ? "m²" : grupo === "parametro" ? "%" : "$", baseKey: "COSTO_DIRECTO", pct: "0" });
+    setVars((p) => [...p, nv]); abrirEdicion(nv.key);
+  };
+  const duplicar = (key) => {
+    const o = porKey[key]; if (!o) return;
+    const nv = { ...o, key: nuevaClave(o.key), nombre: o.nombre + " (copia)" };
+    setVars((p) => [...p, nv]); abrirEdicion(nv.key);
+  };
   const eliminar = (key) => {
     const u = usos(key);
     if (u.length) return notificar("No se puede borrar: la usan " + u.map((x) => x.key).join(", "), true);
     setVars((p) => p.filter((x) => x.key !== key));
-    if (sel === key) setSel("INVERSION_SIN_IVA");
+    if (sel === key) { setSel("INVERSION_SIN_IVA"); setModal(false); }
   };
   const renombrar = (viejo, nuevo) => {
     const limpio = nuevo.toUpperCase().replace(/[^A-Z0-9_]/g, "_");
@@ -373,30 +536,36 @@ function App() {
     if (sel === viejo) setSel(limpio);
   };
 
-  const exportar = () => {
-    const blob = new Blob([JSON.stringify({ vars, escenarios }, null, 2)], { type: "application/json" });
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = "modelo-fraccion-4.json"; a.click();
+  const fecha = new Date().toISOString().slice(0, 10);
+  const alGuardar = () => {
+    try { guardarHTML({ vars, escenarios, titulos }, titulos.archivo + "_" + fecha + ".html");
+      notificar("Se descargó un HTML nuevo con todos tus cambios"); }
+    catch (e) { notificar("No se pudo generar el archivo: " + e.message, true); }
   };
+  const aPDF = () => {
+    const previa = vista;
+    setVista("reporte");
+    setModal(false);
+    setTimeout(() => { window.print(); setTimeout(() => setVista(previa), 400); }, 350);
+  };
+  const exportar = () => descargar(JSON.stringify({ vars, escenarios, titulos }, null, 2), titulos.archivo + "_" + fecha + ".json", "application/json");
   const importar = (ev) => {
     const f = ev.target.files[0]; if (!f) return;
     const r = new FileReader();
     r.onload = () => { try { const d = JSON.parse(r.result);
-      if (d.vars) setVars(d.vars); if (d.escenarios) setEscenarios(d.escenarios);
+      if (d.vars) setVars(d.vars);
+      if (d.escenarios) setEscenarios(d.escenarios);
+      if (d.titulos) setTitulos((t) => ({ ...t, ...d.titulos }));
       notificar("Modelo importado"); } catch (e) { notificar("El archivo no es un modelo válido", true); } };
     r.readAsText(f); ev.target.value = "";
   };
-
-  const guardarEsc = () => { setEscenarios((p) => [...p, { nombre: "Escenario " + (p.length + 1), vars: JSON.parse(JSON.stringify(vars)) }]); notificar("Escenario capturado"); };
+  const capturar = () => { setEscenarios((p) => [...p, { nombre: "Escenario " + (p.length + 1), vars: JSON.parse(JSON.stringify(vars)) }]); notificar("Escenario capturado"); };
 
   const partidas = useMemo(() => vars.filter((x) => x.grupo === "partida" && x.key !== "COSTO_DIRECTO")
-    .map((x) => ({ key: x.key, nombre: x.nombre, valor: scope[x.key] || 0 }))
-    .sort((a, b) => b.valor - a.valor), [vars, scope]);
+    .map((x) => ({ key: x.key, nombre: x.nombre, valor: scope[x.key] || 0 })).sort((a, b) => b.valor - a.valor), [vars, scope]);
 
   const tornado = useMemo(() => {
-    const base = scope[objetivo];
-    if (!isFinite(base)) return [];
+    const base = scope[objetivo]; if (!isFinite(base)) return [];
     return vars.filter((x) => x.tipo === "valor" && x.key !== objetivo).map((x) => {
       const cl = (m) => vars.map((y) => (y.key === x.key ? { ...y, valor: Number(y.valor) * m } : y));
       const alto = calcular(cl(1 + rango / 100)).scope[objetivo];
@@ -407,187 +576,116 @@ function App() {
   }, [vars, scope, objetivo, rango]);
 
   const sv = porKey[sel];
+  const formaProps = { editar, renombrar, claves, GRUPOS, estado, scope, porKey, deps, usos, onIr: abrirEdicion };
   const T = [["variables","Variables"],["indicadores","Indicadores"],["sensibilidad","Sensibilidad"],["escenarios","Escenarios"],["reporte","Reporte"]];
 
-  return html`
+  return (
     <div className="wrap">
       <header className="top">
-        <div>
-          <h1>Fracción 4 · Altamira Logistics</h1>
-          <p className="sub">Modelo de variables para decisiones de inversión · NUEVALTA, Altamira, Tamaulipas</p>
+        <div style={{ minWidth: 220, flex: 1 }}>
+          <input className="tit" value={titulos.proyecto} style={{ fontSize: 21, fontWeight: 600, border: "none", padding: 0, background: "none" }}
+            onChange={(e) => setTitulos((t) => ({ ...t, proyecto: e.target.value }))} aria-label="Nombre del proyecto" />
+          <input className="tit sub" value={titulos.subtitulo} style={{ border: "none", padding: 0, background: "none", fontSize: 13, color: "var(--tinta2)" }}
+            onChange={(e) => setTitulos((t) => ({ ...t, subtitulo: e.target.value }))} aria-label="Subtítulo" />
         </div>
-        <div style=${{ display: "flex", gap: 26, alignItems: "flex-end" }}>
-          <div className="cifra"><div className="mini">Inversión antes de IVA</div><div className="v num">${fmt(scope.INVERSION_SIN_IVA, "$")}</div></div>
-          <div className="cifra"><div className="mini">Costo por m² vendible</div><div className="v num">${fmt(scope.COSTO_M2_VENDIBLE, "$/m²")}</div></div>
+        <div className="cifras">
+          <div className="cifra"><div className="mini">Inversión antes de IVA</div><div className="v num">{fmt(scope.INVERSION_SIN_IVA, "$")}</div></div>
+          <div className="cifra"><div className="mini">Costo m² vendible</div><div className="v num">{fmt(scope.COSTO_M2_VENDIBLE, "$/m²")}</div></div>
           <div className="cifra"><div className="mini">Margen bruto</div>
-            <div className="v num" style=${{ color: scope.MARGEN > 0 ? "var(--verde)" : "var(--rojo)" }}>${fmt(scope.MARGEN, "%")}</div></div>
+            <div className="v num" style={{ color: scope.MARGEN > 0 ? "var(--verde)" : "var(--rojo)" }}>{fmt(scope.MARGEN, "%")}</div></div>
         </div>
       </header>
 
-      <nav>
-        ${T.map(([id, t]) => html`<button key=${id} className=${"tab" + (vista === id ? " on" : "")} onClick=${() => setVista(id)}>${t}</button>`)}
-        <div className="grow" />
-        <button className="btn" onClick=${guardar}>Guardar</button>
-        <button className="btn" onClick=${exportar}>Exportar</button>
-        <label className="btn" style=${{ display: "inline-block" }}>
-          Importar<input type="file" accept=".json" onChange=${importar} style=${{ display: "none" }} />
+      <div className="acciones">
+        <span className="sep" />
+        <button className="ico p" onClick={alGuardar} title="Guardar como HTML nuevo"><IcoGuardar /></button>
+        <button className="ico" onClick={exportar} title="Exportar datos JSON"><IcoBajar /></button>
+        <label className="ico" title="Importar datos JSON" style={{ cursor: "pointer" }}>
+          <IcoSubir /><input type="file" accept=".json" onChange={importar} style={{ display: "none" }} />
         </label>
-      </nav>
+        <button className="ico" onClick={aPDF} title="Exportar a PDF"><IcoPDF /></button>
+        <button className="ico" onClick={() => setAjustes(true)} title="Títulos y ajustes"><IcoAjustes /></button>
+      </div>
 
-      ${aviso && html`<div className=${"aviso " + (aviso.err ? "err" : "ok")}>${aviso.t}</div>`}
+      <div className="tabs">
+        {T.map(([id, t]) => <button key={id} className={"tab" + (vista === id ? " on" : "")} onClick={() => setVista(id)}>{t}</button>)}
+      </div>
 
-      ${vista === "variables" && html`
+      {aviso && <div className={"aviso " + (aviso.err ? "err" : "ok")}>{aviso.t}</div>}
+
+      {/* ---------------- VARIABLES ---------------- */}
+      {vista === "variables" && (
         <div className="cols">
           <div>
-            ${GRUPOS.map((g) => {
-              const lista = vars.filter((x) => x.grupo === g.id);
-              return html`
-                <section key=${g.id} style=${{ marginBottom: 22 }}>
-                  <div style=${{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
-                    <h2 style=${{ color: g.color }}>${g.nombre}</h2>
-                    <button className="btn mini" onClick=${() => agregar(g.id)}>+ Agregar</button>
-                  </div>
-                  <p className="mini" style=${{ margin: "3px 0 7px" }}>${g.ayuda}</p>
-                  <div className="card">
-                    ${lista.map((x) => {
-                      const st = estado[x.key] || {};
-                      return html`
-                        <button key=${x.key} className=${"vrow" + (sel === x.key ? " on" : "")} onClick=${() => setSel(x.key)}>
-                          <span className="k" style=${{ color: g.color }}>${x.key}</span>
-                          <span className="n">${x.nombre}</span>
-                          ${x.supuesto && html`<span className="tag sup">supuesto</span>`}
-                          <span className="v num">${st.error ? html`<em style=${{ color: "var(--rojo)" }}>error</em>` : fmt(st.valor, x.unidad)}</span>
+          {GRUPOS.map((g) => {
+            const lista = vars.filter((x) => x.grupo === g.id);
+            return (
+              <section key={g.id} style={{ marginBottom: 22 }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10 }}>
+                  <h2 style={{ color: g.color }}>{g.nombre}</h2>
+                  <button className="ico" style={{ width: 34, height: 34 }} onClick={() => agregar(g.id)} title={"Agregar en " + g.nombre}><IcoMas s={17} /></button>
+                </div>
+                <p className="mini" style={{ margin: "3px 0 8px" }}>{g.ayuda}</p>
+                <div className="card">
+                  {lista.map((x) => {
+                    const st = estado[x.key] || {};
+                    return (
+                      <div key={x.key} className={"vrow" + (!esMovil && sel === x.key ? " on" : "")}>
+                        <button className="vcuerpo" onClick={() => abrirEdicion(x.key)}>
+                          <span className="k" style={{ color: g.color }}>{x.key}</span>
+                          <span className="n">{x.nombre}</span>
+                          {x.supuesto && <span className="tag sup">supuesto</span>}
+                          <span className="v num">{st.error
+                            ? <span style={{ color: "var(--rojo)", display: "inline-flex", alignItems: "center", gap: 4 }}><IcoAlerta s={14} />error</span>
+                            : fmt(st.valor, x.unidad)}</span>
                         </button>
-                      `;
-                    })}
-                    ${!lista.length && html`<div style=${{ padding: "10px 12px" }} className="mini">Sin variables en este grupo.</div>`}
-                  </div>
-                </section>
-              `;
-            })}
+                        <button className="ico" style={{ width: 34, height: 34, border: "none" }} title="Opciones"
+                          onClick={(e) => { const r = e.currentTarget.getBoundingClientRect(); setMenu({ key: x.key, x: r.left - 170, y: r.bottom + 4 }); }}>
+                          <IcoPuntos s={17} />
+                        </button>
+                      </div>
+                    );
+                  })}
+                  {!lista.length && <div style={{ padding: "12px" }} className="mini">Sin variables en este grupo.</div>}
+                </div>
+              </section>
+            );
+          })}
           </div>
-
-          <aside className="card pad sticky">
-            ${!sv ? html`<p className="mini">Elige una variable para editarla.</p>` : html`
-              <div>
-                <div style=${{ display: "flex", justifyContent: "space-between", marginBottom: 10 }}>
-                  <h3 style=${{ margin: 0 }}>Editar variable</h3>
-                  <button className="btn mini" style=${{ color: "var(--rojo)" }} onClick=${() => eliminar(sv.key)}>Borrar</button>
-                </div>
-                <${Campo} etiqueta="Clave (se usa en fórmulas)">
-                  <input className="mono" value=${sv.key} onChange=${(e) => renombrar(sv.key, e.target.value)} />
-                <//>
-                <${Campo} etiqueta="Nombre">
-                  <input value=${sv.nombre} onChange=${(e) => editar(sv.key, "nombre", e.target.value)} />
-                <//>
-                <div style=${{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
-                  <${Campo} etiqueta="Grupo">
-                    <select value=${sv.grupo} onChange=${(e) => editar(sv.key, "grupo", e.target.value)}>
-                      ${GRUPOS.map((g) => html`<option key=${g.id} value=${g.id}>${g.nombre}</option>`)}
-                    </select>
-                  <//>
-                  <${Campo} etiqueta="Unidad">
-                    <select value=${sv.unidad} onChange=${(e) => editar(sv.key, "unidad", e.target.value)}>
-                      ${["$", "%", "m²", "m", "ha", "lote", "kVA", "$/m²", "$/m", "$/ha", "$/lote", "$/kVA", ""].map((u) =>
-                        html`<option key=${u} value=${u}>${u || "sin unidad"}</option>`)}
-                    </select>
-                  <//>
-                </div>
-                <${Campo} etiqueta="Cómo se obtiene">
-                  <div className="seg">
-                    ${[["valor", "Valor fijo"], ["porcentaje", "% de otra"], ["formula", "Fórmula"]].map(([t, l]) =>
-                      html`<button key=${t} className=${sv.tipo === t ? "on" : ""} onClick=${() => editar(sv.key, "tipo", t)}>${l}</button>`)}
-                  </div>
-                <//>
-
-                ${sv.tipo === "valor" && html`
-                  <${Campo} etiqueta="Valor">
-                    <input type="number" className="num" value=${sv.valor}
-                      onChange=${(e) => editar(sv.key, "valor", e.target.value === "" ? 0 : parseFloat(e.target.value))} />
-                  <//>
-                `}
-                ${sv.tipo === "porcentaje" && html`
-                  <div>
-                    <${Campo} etiqueta="Se calcula sobre">
-                      <select className="mono" value=${sv.baseKey} onChange=${(e) => editar(sv.key, "baseKey", e.target.value)}>
-                        ${claves.filter((k) => k !== sv.key).map((k) => html`<option key=${k} value=${k}>${k}</option>`)}
-                      </select>
-                    <//>
-                    <${Campo} etiqueta="Porcentaje (número o clave de variable)">
-                      <input className="mono" value=${sv.pct} onChange=${(e) => editar(sv.key, "pct", e.target.value)} />
-                    <//>
-                  </div>
-                `}
-                ${sv.tipo === "formula" && html`
-                  <${Campo} etiqueta="Fórmula">
-                    <textarea className="mono" rows=${3} value=${sv.formula} onChange=${(e) => editar(sv.key, "formula", e.target.value)} />
-                  <//>
-                `}
-                <${Campo} etiqueta="Nota">
-                  <input value=${sv.nota} onChange=${(e) => editar(sv.key, "nota", e.target.value)} />
-                <//>
-                <label style=${{ display: "flex", gap: 7, alignItems: "center", fontSize: 13, marginBottom: 10 }}>
-                  <input type="checkbox" style=${{ width: "auto" }} checked=${!!sv.supuesto}
-                    onChange=${(e) => editar(sv.key, "supuesto", e.target.checked)} />
-                  Marcar como supuesto por confirmar
-                </label>
-                <label style=${{ display: "flex", gap: 7, alignItems: "center", fontSize: 13, marginBottom: 10 }}>
-                  <input type="checkbox" style=${{ width: "auto" }} checked=${!!sv.destacado}
-                    onChange=${(e) => editar(sv.key, "destacado", e.target.checked)} />
-                  Mostrar como indicador destacado
-                </label>
-
-                <div style=${{ borderTop: "1px solid var(--regla)", paddingTop: 9, marginBottom: 12 }}>
-                  <div className="mini">Valor calculado</div>
-                  <div className="num" style=${{ fontSize: 21, fontWeight: 600 }}>
-                    ${estado[sv.key] && estado[sv.key].error
-                      ? html`<span style=${{ color: "var(--rojo)", fontSize: 13 }}>${estado[sv.key].error}</span>`
-                      : fmt(estado[sv.key] && estado[sv.key].valor, sv.unidad)}
-                  </div>
-                </div>
-
-                ${sv.tipo !== "valor" && html`<${Chips} titulo="Usa estas variables" items=${deps(sv, claves)} onIr=${setSel} porKey=${porKey} scope=${scope} />`}
-                <${Chips} titulo="La usan" items=${usos(sv.key).map((u) => u.key)} onIr=${setSel} porKey=${porKey} scope=${scope} />
-
-                ${sv.tipo === "formula" && html`
-                  <div>
-                    <div className="mini" style=${{ marginBottom: 3 }}>Insertar variable en la fórmula</div>
-                    <div className="scroll">
-                      ${claves.filter((k) => k !== sv.key).map((k) =>
-                        html`<button key=${k} onClick=${() => editar(sv.key, "formula", (sv.formula || "") + " " + k)}>${k}</button>`)}
-                    </div>
-                  </div>
-                `}
+          <aside className="card aside">
+            {sv ? (
+              <div style={{ padding: 16 }}>
+                <h3 style={{ marginBottom: 12 }}>Editar variable</h3>
+                <FormaVariable sv={sv} {...formaProps} />
               </div>
-            `}
+            ) : <p className="mini vacio">Elige una variable de la lista para editarla aquí.</p>}
           </aside>
         </div>
-      `}
+      )}
 
-      ${vista === "indicadores" && html`
+      {/* ---------------- INDICADORES ---------------- */}
+      {vista === "indicadores" && (
         <div>
-          <div className="grid" style=${{ marginBottom: 20 }}>
-            ${vars.filter((x) => x.destacado).map((x) => html`
-              <div key=${x.key} className="card pad">
-                <div className="mini">${x.nombre}</div>
-                <div className="num" style=${{ fontSize: 23, fontWeight: 600, marginTop: 3,
+          <div className="grid" style={{ marginBottom: 20 }}>
+            {vars.filter((x) => x.destacado).map((x) => (
+              <button key={x.key} className="card pad" style={{ textAlign: "left", cursor: "pointer", font: "inherit" }} onClick={() => abrirEdicion(x.key)}>
+                <div className="mini">{x.nombre}</div>
+                <div className="num" style={{ fontSize: 22, fontWeight: 600, marginTop: 3,
                   color: (x.key === "MARGEN" || x.key === "UTILIDAD_PROYECTO") ? (scope[x.key] > 0 ? "var(--verde)" : "var(--rojo)") : "var(--tinta)" }}>
-                  ${fmt(scope[x.key], x.unidad)}
-                </div>
-                ${x.nota && html`<div className="mini" style=${{ marginTop: 3 }}>${x.nota}</div>`}
-              </div>
-            `)}
+                  {fmt(scope[x.key], x.unidad)}</div>
+                {x.nota && <div className="mini" style={{ marginTop: 3 }}>{x.nota}</div>}
+              </button>
+            ))}
           </div>
-          <section className="card pad" style=${{ marginBottom: 20 }}>
-            <h2 style=${{ marginBottom: 12 }}>Costo directo por partida</h2>
-            <${Barras} datos=${partidas} />
+          <section className="card pad" style={{ marginBottom: 20 }}>
+            <h2 style={{ marginBottom: 12 }}>Costo directo por partida</h2>
+            <Barras datos={partidas} />
           </section>
           <section className="card pad">
-            <h2 style=${{ marginBottom: 12 }}>Del costo directo a la inversión</h2>
-            <${Tabla} total=${scope.INVERSION_SIN_IVA} filas=${[
-              ["Costo directo de obra", scope.COSTO_DIRECTO],
-              ["Indirectos", scope.INDIRECTOS], ["Financiamiento", scope.FINANCIAMIENTO],
-              ["Utilidad del contratista", scope.UTILIDAD],
+            <h2 style={{ marginBottom: 12 }}>Del costo directo a la inversión</h2>
+            <Tabla total={scope.INVERSION_SIN_IVA} filas={[
+              ["Costo directo de obra", scope.COSTO_DIRECTO], ["Indirectos", scope.INDIRECTOS],
+              ["Financiamiento", scope.FINANCIAMIENTO], ["Utilidad del contratista", scope.UTILIDAD],
               ["Precio de obra contratada", scope.OBRA_CONTRATADA, true],
               ["Estudios y proyectos", scope.PROYECTOS], ["Licencias y permisos", scope.LICENCIAS],
               ["Supervisión y gerencia", scope.SUPERVISION], ["Contingencia", scope.CONTINGENCIA],
@@ -596,128 +694,118 @@ function App() {
               ["IVA", scope.IVA], ["Inversión total con IVA", scope.INVERSION_TOTAL, true]]} />
           </section>
         </div>
-      `}
+      )}
 
-      ${vista === "sensibilidad" && html`
+      {/* ---------------- SENSIBILIDAD ---------------- */}
+      {vista === "sensibilidad" && (
         <div>
-          <div className="card pad" style=${{ display: "flex", flexWrap: "wrap", gap: 20, alignItems: "flex-end", marginBottom: 18 }}>
-            <div style=${{ minWidth: 280 }}>
-              <${Campo} etiqueta="Qué quiero medir">
-                <select value=${objetivo} onChange=${(e) => setObjetivo(e.target.value)}>
-                  ${vars.filter((x) => x.tipo !== "valor").map((x) => html`<option key=${x.key} value=${x.key}>${x.nombre}</option>`)}
-                </select>
-              <//>
-            </div>
-            <div>
-              <${Campo} etiqueta=${"Variación aplicada: ±" + rango + "%"}>
-                <input type="range" min="5" max="50" step="5" value=${rango}
-                  onChange=${(e) => setRango(parseInt(e.target.value))} style=${{ width: 220 }} />
-              <//>
-            </div>
-            <div className="grow" />
-            <div className="num" style=${{ fontSize: 15 }}>
-              Valor base: <strong>${fmt(scope[objetivo], porKey[objetivo] && porKey[objetivo].unidad)}</strong>
+          <div className="card pad" style={{ marginBottom: 18 }}>
+            <Campo etiqueta="Qué quiero medir">
+              <select value={objetivo} onChange={(e) => setObjetivo(e.target.value)}>
+                {vars.filter((x) => x.tipo !== "valor").map((x) => <option key={x.key} value={x.key}>{x.nombre}</option>)}
+              </select>
+            </Campo>
+            <Campo etiqueta={"Variación aplicada: ±" + rango + "%"}>
+              <input type="range" min="5" max="50" step="5" value={rango} onChange={(e) => setRango(parseInt(e.target.value))} />
+            </Campo>
+            <div className="num" style={{ fontSize: 15 }}>
+              Valor base: <strong>{fmt(scope[objetivo], porKey[objetivo] && porKey[objetivo].unidad)}</strong>
             </div>
           </div>
           <section className="card pad">
             <h2>Qué mueve más el resultado</h2>
-            <p className="mini" style=${{ margin: "4px 0 14px" }}>
-              Cada barra muestra cuánto cambia ${porKey[objetivo] ? porKey[objetivo].nombre.toLowerCase() : ""} si esa variable sube o baja ${rango}%.
+            <p className="mini" style={{ margin: "4px 0 14px" }}>
+              Cada barra muestra cuánto cambia {porKey[objetivo] ? porKey[objetivo].nombre.toLowerCase() : ""} si esa variable sube o baja {rango}%.
             </p>
-            ${tornado.length ? html`<${Tornado} datos=${tornado} />` : html`<p className="mini">Ninguna variable de valor fijo afecta este resultado.</p>`}
-            <div className="mini" style=${{ display: "flex", gap: 20, marginTop: 12 }}>
-              <span><span style=${{ display: "inline-block", width: 11, height: 11, background: "var(--verde)", marginRight: 5 }} />Si la variable baja ${rango}%</span>
-              <span><span style=${{ display: "inline-block", width: 11, height: 11, background: "var(--ambar)", marginRight: 5 }} />Si la variable sube ${rango}%</span>
+            {tornado.length ? <Tornado datos={tornado} /> : <p className="mini">Ninguna variable de valor fijo afecta este resultado.</p>}
+            <div className="mini" style={{ display: "flex", gap: 18, marginTop: 12, flexWrap: "wrap" }}>
+              <span><span style={{ display: "inline-block", width: 11, height: 11, background: "var(--verde)", marginRight: 5 }} />Si baja {rango}%</span>
+              <span><span style={{ display: "inline-block", width: 11, height: 11, background: "var(--ambar)", marginRight: 5 }} />Si sube {rango}%</span>
             </div>
           </section>
         </div>
-      `}
+      )}
 
-      ${vista === "escenarios" && html`
+      {/* ---------------- ESCENARIOS ---------------- */}
+      {vista === "escenarios" && (
         <div>
-          <div style=${{ display: "flex", gap: 14, alignItems: "center", marginBottom: 16 }}>
-            <button className="btn p" onClick=${guardarEsc}>Capturar estado actual</button>
+          <div style={{ display: "flex", gap: 12, alignItems: "center", marginBottom: 16, flexWrap: "wrap" }}>
+            <button className="btn p" onClick={capturar} style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
+              <IcoCamara s={17} />Capturar estado actual
+            </button>
             <span className="mini">Modifica variables, captura, y compara las corridas.</span>
           </div>
-          ${!escenarios.length ? html`
-            <div className="card pad mini" style=${{ textAlign: "center", padding: 40 }}>
+          {!escenarios.length ? (
+            <div className="card pad mini" style={{ textAlign: "center", padding: 36 }}>
               Aún no hay escenarios. Captura el estado actual para empezar a comparar.
             </div>
-          ` : html`
+          ) : (
             <div>
-              <div className="card" style=${{ overflowX: "auto", marginBottom: 20 }}>
+              <div className="card tblwrap" style={{ marginBottom: 20 }}>
                 <table>
-                  <thead><tr>
-                    <th>Indicador</th><th className="r">Actual</th>
-                    ${escenarios.map((e, i) => html`<th key=${i} className="r">
-                      <input value=${e.nombre} style=${{ textAlign: "right", border: "none", borderBottom: "1px solid var(--regla)", padding: 2 }}
-                        onChange=${(ev) => setEscenarios((p) => p.map((x, j) => j === i ? { ...x, nombre: ev.target.value } : x))} />
-                    </th>`)}
-                  </tr></thead>
+                  <thead><tr><th>Indicador</th><th className="r">Actual</th>
+                    {escenarios.map((e, i) => <th key={i} className="r">
+                      <input value={e.nombre} style={{ textAlign: "right", border: "none", borderBottom: "1px solid var(--regla)", padding: 3, fontSize: 13, width: 110 }}
+                        onChange={(ev) => setEscenarios((p) => p.map((x, j) => j === i ? { ...x, nombre: ev.target.value } : x))} />
+                    </th>)}</tr></thead>
                   <tbody>
-                    ${vars.filter((x) => x.destacado).map((x) => html`
-                      <tr key=${x.key}>
-                        <td>${x.nombre}</td>
-                        <td className="r num" style=${{ fontWeight: 500 }}>${fmt(scope[x.key], x.unidad)}</td>
-                        ${escenarios.map((e, i) => {
+                    {vars.filter((x) => x.destacado).map((x) => (
+                      <tr key={x.key}>
+                        <td>{x.nombre}</td>
+                        <td className="r num" style={{ fontWeight: 500 }}>{fmt(scope[x.key], x.unidad)}</td>
+                        {escenarios.map((e, i) => {
                           const s = calcular(e.vars).scope;
                           const d = (s[x.key] || 0) - (scope[x.key] || 0);
-                          return html`<td key=${i} className="r num">${fmt(s[x.key], x.unidad)}
-                            ${Math.abs(d) > 0.01 && html`<div className="mini" style=${{ color: d > 0 ? "var(--ambar)" : "var(--verde)" }}>
-                              ${d > 0 ? "+" : ""}${corto(d)}</div>`}
-                          </td>`;
+                          return <td key={i} className="r num">{fmt(s[x.key], x.unidad)}
+                            {Math.abs(d) > 0.01 && <div className="mini" style={{ color: d > 0 ? "var(--ambar)" : "var(--verde)" }}>{d > 0 ? "+" : ""}{corto(d)}</div>}
+                          </td>;
                         })}
-                      </tr>
-                    `)}
+                      </tr>))}
                     <tr><td /><td />
-                      ${escenarios.map((_, i) => html`<td key=${i} className="r">
-                        <button className="btn mini" onClick=${() => { setVars(JSON.parse(JSON.stringify(escenarios[i].vars))); notificar("Escenario cargado"); }}>Cargar</button>{" "}
-                        <button className="btn mini" style=${{ color: "var(--rojo)" }} onClick=${() => setEscenarios((p) => p.filter((_, j) => j !== i))}>Borrar</button>
-                      </td>`)}
-                    </tr>
+                      {escenarios.map((_, i) => <td key={i} className="r" style={{ whiteSpace: "nowrap" }}>
+                        <button className="btn mini" onClick={() => { setVars(JSON.parse(JSON.stringify(escenarios[i].vars))); notificar("Escenario cargado"); }}>Cargar</button>{" "}
+                        <button className="btn mini" style={{ color: "var(--rojo)" }} onClick={() => setEscenarios((p) => p.filter((_, j) => j !== i))}>Borrar</button>
+                      </td>)}</tr>
                   </tbody>
                 </table>
               </div>
               <section className="card pad">
-                <h2 style=${{ marginBottom: 12 }}>Inversión antes de IVA por escenario</h2>
-                ${(() => {
+                <h2 style={{ marginBottom: 12 }}>Inversión antes de IVA por escenario</h2>
+                {(() => {
                   const d = [{ nombre: "Actual", valor: scope.INVERSION_SIN_IVA || 0, act: true },
                     ...escenarios.map((e) => ({ nombre: e.nombre, valor: calcular(e.vars).scope.INVERSION_SIN_IVA || 0 }))];
                   const max = Math.max(...d.map((x) => x.valor), 1);
-                  return html`<div className="vbars">${d.map((x, i) => html`
-                    <div className="vbar" key=${i}>
-                      <div className="num mini">${corto(x.valor)}</div>
-                      <div className="b" style=${{ height: (x.valor / max) * 100 + "%", background: x.act ? "var(--tinta)" : "var(--azul)" }} />
-                      <div className="cap">${x.nombre}</div>
-                    </div>`)}</div>`;
+                  return <div className="vbars">{d.map((x, i) => (
+                    <div className="vbar" key={i}>
+                      <div className="num mini">{corto(x.valor)}</div>
+                      <div className="b" style={{ height: (x.valor / max) * 100 + "%", background: x.act ? "var(--tinta)" : "var(--azul)" }} />
+                      <div className="cap">{x.nombre}</div>
+                    </div>))}</div>;
                 })()}
               </section>
             </div>
-          `}
+          )}
         </div>
-      `}
+      )}
 
-      ${vista === "reporte" && html`
+      {/* ---------------- REPORTE ---------------- */}
+      {vista === "reporte" && (
         <div className="card">
-          <div style=${{ padding: "22px 22px 0" }}>
-            <h2 style=${{ fontSize: 20 }}>Resumen de inversión</h2>
-            <p className="sub">Fracción 4 · Altamira Logistics · ${new Date().toLocaleDateString("es-MX", { day: "numeric", month: "long", year: "numeric" })}</p>
+          <div style={{ padding: "20px 20px 0" }}>
+            <h2 style={{ fontSize: 20 }}>{titulos.reporte}</h2>
+            <p className="sub">{titulos.proyecto} · {new Date().toLocaleDateString("es-MX", { day: "numeric", month: "long", year: "numeric" })}</p>
           </div>
-          <div style=${{ padding: "16px 22px", display: "grid", gap: 16, gridTemplateColumns: "repeat(auto-fit,minmax(175px,1fr))" }}>
-            ${["INVERSION_SIN_IVA", "COSTO_M2_VENDIBLE", "COSTO_POR_LOTE", "MARGEN"].map((k) => html`
-              <div className="kpi" key=${k}>
-                <div className="mini">${porKey[k] && porKey[k].nombre}</div>
-                <div className="v num">${fmt(scope[k], porKey[k] && porKey[k].unidad)}</div>
-              </div>
-            `)}
+          <div style={{ padding: "14px 20px", display: "grid", gap: 16, gridTemplateColumns: "repeat(auto-fit,minmax(160px,1fr))" }}>
+            {["INVERSION_SIN_IVA", "COSTO_M2_VENDIBLE", "COSTO_POR_LOTE", "MARGEN"].map((k) => porKey[k] && (
+              <div className="kpi" key={k}>
+                <div className="mini">{porKey[k].nombre}</div>
+                <div className="v num">{fmt(scope[k], porKey[k].unidad)}</div>
+              </div>))}
           </div>
-          <div style=${{ padding: "0 22px 18px" }}>
-            <h3>Composición del costo directo</h3>
-            <${Barras} datos=${partidas} />
-          </div>
-          <div style=${{ padding: "0 22px 18px" }}>
+          <div style={{ padding: "0 20px 18px" }}><h3>Composición del costo directo</h3><Barras datos={partidas} /></div>
+          <div style={{ padding: "0 20px 18px" }}>
             <h3>Integración</h3>
-            <${Tabla} total=${scope.INVERSION_SIN_IVA} filas=${[
+            <Tabla total={scope.INVERSION_SIN_IVA} filas={[
               ["Costo directo de obra", scope.COSTO_DIRECTO],
               ["Indirectos, financiamiento y utilidad", (scope.INDIRECTOS || 0) + (scope.FINANCIAMIENTO || 0) + (scope.UTILIDAD || 0)],
               ["Estudios, licencias y supervisión", (scope.PROYECTOS || 0) + (scope.LICENCIAS || 0) + (scope.SUPERVISION || 0)],
@@ -725,33 +813,134 @@ function App() {
               ["Costo del terreno", scope.COSTO_TERRENO],
               ["Inversión antes de IVA", scope.INVERSION_SIN_IVA, true]]} />
           </div>
-          <div style=${{ padding: "0 22px 24px" }}>
+          <div style={{ padding: "0 20px 24px" }}>
             <h3>Supuestos que sostienen estas cifras</h3>
             <ul className="lista">
-              ${vars.filter((x) => x.supuesto).map((x) => html`
-                <li key=${x.key}>
-                  <span style=${{ flex: 1 }}>${x.nombre}${x.nota ? " — " + x.nota : ""}</span>
-                  <span className="num">${fmt(scope[x.key], x.unidad)}</span>
-                </li>
-              `)}
+              {vars.filter((x) => x.supuesto).map((x) => (
+                <li key={x.key}><span style={{ flex: 1 }}>{x.nombre}{x.nota ? " — " + x.nota : ""}</span>
+                  <span className="num">{fmt(scope[x.key], x.unidad)}</span></li>))}
             </ul>
-            <p className="mini" style=${{ marginTop: 14 }}>
-              Estimado paramétrico clase 4-5 (AACE) sobre plan maestro; rango esperado de −20% a +30%.
-              Precios base de las cotizaciones DLG y ELYEIVER del Fracc. Amaranta, actualizados a agosto de 2026 con el INPP-Construcción del INEGI.
-            </p>
+            <p className="mini" style={{ marginTop: 14 }}>{titulos.pie}</p>
           </div>
         </div>
-      `}
+      )}
+
+      {/* ---------------- MENÚ CONTEXTUAL ---------------- */}
+      {menu && (
+        <MenuCtx pos={menu} onCerrar={() => setMenu(null)} items={[
+          { icono: <IcoEditar s={17} />, texto: "Editar variable", accion: () => abrirEdicion(menu.key) },
+          { icono: <IcoCopiar s={17} />, texto: "Duplicar", accion: () => duplicar(menu.key) },
+          { icono: <IcoEstrella s={17} />, texto: porKey[menu.key] && porKey[menu.key].destacado ? "Quitar de indicadores" : "Mostrar como indicador",
+            accion: () => editar(menu.key, "destacado", !(porKey[menu.key] && porKey[menu.key].destacado)) },
+          { icono: <IcoAlerta s={17} />, texto: porKey[menu.key] && porKey[menu.key].supuesto ? "Quitar marca de supuesto" : "Marcar como supuesto",
+            accion: () => editar(menu.key, "supuesto", !(porKey[menu.key] && porKey[menu.key].supuesto)) },
+          { sep: true },
+          { icono: <IcoBorrar s={17} />, texto: "Borrar", rojo: true, accion: () => eliminar(menu.key) },
+        ]} />
+      )}
+
+      {/* ---------------- EDICIÓN EN MODAL (móvil) ---------------- */}
+      {sv && esMovil && modal && (
+        <Modal titulo={"Editar · " + sv.nombre} onCerrar={() => setModal(false)}
+          pie={<><button className="btn" onClick={() => duplicar(sv.key)}>Duplicar</button>
+                 <button className="btn p" onClick={() => setModal(false)}>Listo</button></>}>
+          <FormaVariable sv={sv} {...formaProps} />
+        </Modal>
+      )}
+
+      {/* ---------------- MODAL DE AJUSTES ---------------- */}
+      {ajustes && (
+        <Modal titulo="Títulos y ajustes" onCerrar={() => setAjustes(false)}
+          pie={<button className="btn p" onClick={() => setAjustes(false)}>Listo</button>}>
+          <Campo etiqueta="Nombre del proyecto"><input value={titulos.proyecto} onChange={(e) => setTitulos((t) => ({ ...t, proyecto: e.target.value }))} /></Campo>
+          <Campo etiqueta="Subtítulo"><input value={titulos.subtitulo} onChange={(e) => setTitulos((t) => ({ ...t, subtitulo: e.target.value }))} /></Campo>
+          <Campo etiqueta="Título del reporte"><input value={titulos.reporte} onChange={(e) => setTitulos((t) => ({ ...t, reporte: e.target.value }))} /></Campo>
+          <Campo etiqueta="Pie de página del reporte"><textarea rows={4} value={titulos.pie} onChange={(e) => setTitulos((t) => ({ ...t, pie: e.target.value }))} /></Campo>
+          <Campo etiqueta="Nombre base del archivo al guardar">
+            <input value={titulos.archivo} onChange={(e) => setTitulos((t) => ({ ...t, archivo: e.target.value.replace(/[^A-Za-z0-9_\-]/g, "-") }))} /></Campo>
+          <p className="mini">Se descargará como <strong>{titulos.archivo}_{fecha}.html</strong>, con tus variables y escenarios ya embebidos.</p>
+        </Modal>
+      )}
     </div>
-  `;
+  );
 }
 
-window.addEventListener('DOMContentLoaded', () => {
-  const rootElement = document.getElementById("raiz");
-  if (rootElement) {
-    ReactDOM.createRoot(rootElement).render(html`<${App} />`);
-  }
-});
+function FormaVariable({ sv, editar, renombrar, claves, GRUPOS, estado, scope, porKey, deps, usos, onIr }) {
+  return (
+    <div>
+      <Campo etiqueta="Clave (se usa en fórmulas)">
+        <input className="mono" value={sv.key} onChange={(e) => renombrar(sv.key, e.target.value)} />
+      </Campo>
+      <Campo etiqueta="Nombre"><input value={sv.nombre} onChange={(e) => editar(sv.key, "nombre", e.target.value)} /></Campo>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+        <Campo etiqueta="Grupo">
+          <select value={sv.grupo} onChange={(e) => editar(sv.key, "grupo", e.target.value)}>
+            {GRUPOS.map((g) => <option key={g.id} value={g.id}>{g.nombre}</option>)}</select>
+        </Campo>
+        <Campo etiqueta="Unidad">
+          <select value={sv.unidad} onChange={(e) => editar(sv.key, "unidad", e.target.value)}>
+            {["$", "%", "m²", "m", "ha", "lote", "kVA", "$/m²", "$/m", "$/ha", "$/lote", "$/kVA", ""].map((u) =>
+              <option key={u} value={u}>{u || "sin unidad"}</option>)}</select>
+        </Campo>
+      </div>
+      <Campo etiqueta="Cómo se obtiene">
+        <div className="seg">{[["valor", "Valor fijo"], ["porcentaje", "% de otra"], ["formula", "Fórmula"]].map(([t, l]) =>
+          <button key={t} className={sv.tipo === t ? "on" : ""} onClick={() => editar(sv.key, "tipo", t)}>{l}</button>)}</div>
+      </Campo>
+      {sv.tipo === "valor" && (
+        <Campo etiqueta="Valor"><input type="number" inputMode="decimal" value={sv.valor}
+          onChange={(e) => editar(sv.key, "valor", e.target.value === "" ? 0 : parseFloat(e.target.value))} /></Campo>)}
+      {sv.tipo === "porcentaje" && (
+        <div>
+          <Campo etiqueta="Se calcula sobre">
+            <select className="mono" value={sv.baseKey} onChange={(e) => editar(sv.key, "baseKey", e.target.value)}>
+              {claves.filter((k) => k !== sv.key).map((k) => <option key={k} value={k}>{k}</option>)}</select>
+          </Campo>
+          <Campo etiqueta="Porcentaje (número o clave de variable)">
+            <input className="mono" value={sv.pct} onChange={(e) => editar(sv.key, "pct", e.target.value)} /></Campo>
+        </div>)}
+      {sv.tipo === "formula" && (
+        <div>
+          <Campo etiqueta="Fórmula">
+            <textarea className="mono" rows={3} value={sv.formula} onChange={(e) => editar(sv.key, "formula", e.target.value)} /></Campo>
+          <div className="mini" style={{ marginBottom: 4 }}>Toca una variable para insertarla</div>
+          <div className="scroll" style={{ marginBottom: 12 }}>
+            {claves.filter((k) => k !== sv.key).map((k) =>
+              <button key={k} onClick={() => editar(sv.key, "formula", (sv.formula || "") + " " + k)}>{k}</button>)}
+          </div>
+        </div>)}
+      <Campo etiqueta="Nota"><input value={sv.nota} onChange={(e) => editar(sv.key, "nota", e.target.value)} /></Campo>
+      <label style={{ display: "flex", gap: 9, alignItems: "center", fontSize: 14, marginBottom: 8 }}>
+        <input type="checkbox" style={{ width: "auto" }} checked={!!sv.supuesto} onChange={(e) => editar(sv.key, "supuesto", e.target.checked)} />
+        Marcar como supuesto por confirmar</label>
+      <label style={{ display: "flex", gap: 9, alignItems: "center", fontSize: 14, marginBottom: 14 }}>
+        <input type="checkbox" style={{ width: "auto" }} checked={!!sv.destacado} onChange={(e) => editar(sv.key, "destacado", e.target.checked)} />
+        Mostrar como indicador destacado</label>
+      <div style={{ borderTop: "1px solid var(--regla)", paddingTop: 12, marginBottom: 12 }}>
+        <div className="mini">Valor calculado</div>
+        <div className="num" style={{ fontSize: 22, fontWeight: 600 }}>
+          {estado[sv.key] && estado[sv.key].error
+            ? <span style={{ color: "var(--rojo)", fontSize: 13 }}>{estado[sv.key].error}</span>
+            : fmt(estado[sv.key] && estado[sv.key].valor, sv.unidad)}</div>
+      </div>
+      {sv.tipo !== "valor" && <Chips titulo="Usa estas variables" items={deps(sv, claves)} onIr={onIr} porKey={porKey} scope={scope} />}
+      <Chips titulo="La usan" items={usos(sv.key).map((u) => u.key)} onIr={onIr} porKey={porKey} scope={scope} />
+    </div>);
+}
+
+function Chips({ titulo, items, onIr, porKey, scope }) {
+  if (!items.length) return null;
+  return (
+    <div style={{ marginBottom: 12 }}>
+      <div className="mini" style={{ marginBottom: 4 }}>{titulo}</div>
+      <div>{items.map((k) => (
+        <button key={k} className="chip" onClick={() => onIr(k)}
+          title={(porKey[k] ? porKey[k].nombre : k) + ": " + fmt(scope[k], porKey[k] && porKey[k].unidad)}>{k}</button>))}</div>
+    </div>);
+}
+
+ReactDOM.createRoot(document.getElementById("raiz")).render(<App />);
+
 </script>
 </body>
 </html>
